@@ -10,6 +10,8 @@
 #' @importFrom tibble tibble
 #' @importFrom dplyr left_join recode
 #'
+#' @export
+#'
 #' @return A tibble with the following columns:
 #' \itemize{
 #'   \item \code{GeneName}: Name of the focus gene
