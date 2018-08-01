@@ -10,7 +10,7 @@ GetGeneNeighborhood(GeneGRanges)
 \item{GeneGRanges}{A \code{GRanges} of feature/gene annotations}
 }
 \value{
-A tibble with the following columns:
+A \code{\link{tibble}} with the following columns:
 \itemize{
   \item \code{GeneName}: Name of the focus gene
   \item \code{Chr}: Seqnames of the focus gene
@@ -91,11 +91,11 @@ table(table(GeneNeighbors$GenePair))
 
 
 set.seed(123)
-#The package includes a GRanges named gr with 676 random genes on a single chromosome:
-  GeneNeighborhood::gr
+#The package includes a \\code{GRanges} named Genegr with 676 random genes on a single chromosome:
+  Genegr
 
 #Extract info on the neighbors of these genes:
-  GeneNeighbors <- GetGeneNeighborhood(gr)
+  GeneNeighbors <- GetGeneNeighborhood(Genegr)
 
 #Classes of neighborhoods:
   table(GeneNeighbors$NeighborClass)

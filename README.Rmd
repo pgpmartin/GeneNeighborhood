@@ -18,7 +18,7 @@ The goal of GeneNeighborhood is to extract and analyze the orientation and proxi
 
 ## Installation
 
-You can install the released version of GeneNeighborhood from [CRAN](https://CRAN.R-project.org) with (NOT THERE YET!):
+(NOT THERE YET!) You can install the released version of GeneNeighborhood from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
 install.packages("GeneNeighborhood")
@@ -33,20 +33,57 @@ devtools::install_github("pgpmartin/GeneNeighborhood")
 ## Example
 
 Load the library:
-```{r}
+```{r load libraries}
 library(GeneNeighborhood)
 ```
-  
 
-To run examples, the package includes a *GRanges* named gr that contains 676 genes with random coordinates on a single chromosome *Chr1*:
-```{r gr data}
-gr
+```{r load hidden libs, include = FALSE}
+library(knitr)
+library(dplyr)
 ```
   
+
+To run examples, the package includes a *GRanges* named **Genegr** that contains 676 genes with random coordinates on a single chromosome *Chr1*:
+```{r gr data}
+Genegr
+```
   
+
 For each feature/gene, we extract information (orientation and distance, potential overlaps) about their upstream/downstream neighbors with:
 ```{r extract GeneNeighbors}
-GeneNeighbors <- GetGeneNeighborhood(gr)
+GeneNeighbors <- GetGeneNeighborhood(Genegr)
 ```
-
-
+  
+  
+We define a random set of 100 genes:
+```{r define random genes}
+set.seed(123)
+randGenes <- names(Genegr)[sample.int(676, 100)]
+```
+  
+  
+We extract statistics about the orientation of their neighbors using:
+```{r NOS random genes}
+## Neighbors Orientation Statistics:
+NOS <- AnalyzeNeighborsOrientation(randGenes, 
+                                   GeneNeighborhood = GeneNeighbors)
+```
+  
+  
+By default all genes are used as a universe and an enrichment test is performed.  
+By default, the function also analyzes the *"other"* orientation which may be hard to interpret. We can remove this orientation using:
+```{r NOS without other}
+NOS <- AnalyzeNeighborsOrientation(randGenes, 
+                                   GeneNeighborhood = GeneNeighbors,
+                                   keepOther = FALSE)
+```
+  
+  We obtain the following table:
+```{r NOS kable, echo = FALSE}
+NOS  %>% 
+  dplyr::mutate(p.value = signif(p.value, 2)) %>%
+  knitr::kable(digits = c(1,1,1,2,1,2,300), 
+               format = "markdown",
+               caption="100 random genes")
+```
+  

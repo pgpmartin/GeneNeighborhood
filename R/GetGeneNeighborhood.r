@@ -12,7 +12,7 @@
 #'
 #' @export
 #'
-#' @return A tibble with the following columns:
+#' @return A \code{\link{tibble}} with the following columns:
 #' \itemize{
 #'   \item \code{GeneName}: Name of the focus gene
 #'   \item \code{Chr}: Seqnames of the focus gene
@@ -89,11 +89,11 @@
 #'
 #'
 #' set.seed(123)
-#' #The package includes a GRanges named gr with 676 random genes on a single chromosome:
-#'   GeneNeighborhood::gr
+#' #The package includes a \code{GRanges} named Genegr with 676 random genes on a single chromosome:
+#'   Genegr
 #'
 #' #Extract info on the neighbors of these genes:
-#'   GeneNeighbors <- GetGeneNeighborhood(gr)
+#'   GeneNeighbors <- GetGeneNeighborhood(Genegr)
 #'
 #' #Classes of neighborhoods:
 #'   table(GeneNeighbors$NeighborClass)
