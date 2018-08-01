@@ -1,0 +1,14 @@
+Package: GeneNeighborhood
+Type: Package
+Title: Analyze the neighborhood (upstream/downstream neighbors) of genes
+Version: 0.1.0
+Author: Pascal GP Martin
+Maintainer: Pascal GP Martin <pgp.martin@gmail.com>
+Description: Extract and analyze the orientation and the proximity of upstream/downstream genes.
+    Summaries, statistics and plots allow to analyze pre-defined groups of genes and compare them to a reference.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: IRanges, GenomicRanges, S4Vectors, tibble, dplyr
+Suggests: knitr, TxDb.Athaliana.BioMart.plantsmart25
+RoxygenNote: 6.1.0
