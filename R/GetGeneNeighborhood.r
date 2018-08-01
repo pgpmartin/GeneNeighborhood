@@ -89,15 +89,10 @@
 #'
 #'
 #' set.seed(123)
-#' #Create a GRanges with random genes:
-#'   gr <- GRanges(seqnames = "Chr1",
-#'                 ranges = IRanges(start = sample.int(10000, 676, replace = TRUE),
-#'                                  width = sample.int(10, 676, replace = TRUE),
-#'                                  names = paste0(rep(LETTERS[1:26], times = 26),
-#'                                                 rep(LETTERS[1:26], each = 26))),
-#'                 strand = sample(c("+", "-"), size = 676, replace = TRUE))
+#' #The package includes a GRanges named gr with 676 random genes on a single chromosome:
+#'   GeneNeighborhood::gr
 #'
-#' #Extract info on gene neighbors:
+#' #Extract info on the neighbors of these genes:
 #'   GeneNeighbors <- GetGeneNeighborhood(gr)
 #'
 #' #Classes of neighborhoods:

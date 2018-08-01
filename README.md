@@ -24,28 +24,38 @@ devtools::install_github("pgpmartin/GeneNeighborhood")
 Example
 -------
 
-Let's start by creating a GRanges with random features/genes:
+Load the library:
 
 ``` r
-set.seed(123)
-gr <- GenomicRanges::GRanges(seqnames = "Chr1",
-                             ranges = IRanges::IRanges(start = sample.int(10000, 676, 
-                                                                          replace = TRUE),
-                                                       width = sample.int(10, 676, 
-                                                                          replace = TRUE),
-                                                       names = paste0(rep(LETTERS[1:26], 
-                                                                          times = 26),
-                                                                      rep(LETTERS[1:26], 
-                                                                          each = 26))),
-                                                       strand = sample(c("+", "-"), 
-                                                                       size = 676, 
-                                                                       replace = TRUE))
+library(GeneNeighborhood)
 ```
 
-For each feature/gene, we want to extract information about their upstream/downstream neighbors. We can do this using:
+To run examples, the package includes a *GRanges* named gr that contains 676 genes with random coordinates on a single chromosome *Chr1*:
 
 ``` r
-GeneNeighbors <- GeneNeighborhood::GetGeneNeighborhood(gr)
+gr
+#> GRanges object with 676 ranges and 0 metadata columns:
+#>      seqnames       ranges strand
+#>         <Rle>    <IRanges>  <Rle>
+#>   AA     Chr1 [2876, 2884]      +
+#>   AB     Chr1 [7884, 7886]      +
+#>   AC     Chr1 [4090, 4094]      +
+#>   AD     Chr1 [8831, 8835]      +
+#>   AE     Chr1 [9405, 9412]      +
+#>   ..      ...          ...    ...
+#>   ZV     Chr1 [5214, 5220]      +
+#>   ZW     Chr1 [ 863,  868]      +
+#>   ZX     Chr1 [2831, 2836]      +
+#>   ZY     Chr1 [4205, 4205]      -
+#>   ZZ     Chr1 [5873, 5873]      -
+#>   -------
+#>   seqinfo: 1 sequence from mock genome
+```
+
+For each feature/gene, we extract information (orientation and distance, potential overlaps) about their upstream/downstream neighbors with:
+
+``` r
+GeneNeighbors <- GetGeneNeighborhood(gr)
 #> There are 96 genes (14.2%) that overlap with >1 gene
 #> More than 10% of the genes overlap with multiple genes
 ```
