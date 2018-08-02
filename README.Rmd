@@ -78,7 +78,8 @@ NOS <- AnalyzeNeighborsOrientation(randGenes,
                                    keepOther = FALSE)
 ```
   
-  We obtain the following table:
+  
+We obtain the following table:
 ```{r NOS kable, echo = FALSE}
 NOS  %>% 
   dplyr::mutate(p.value = signif(p.value, 2)) %>%
@@ -87,3 +88,9 @@ NOS  %>%
                caption="100 random genes")
 ```
   
+  
+We can plot the corresponding percentages using:
+```{r plotNeighborsOrientation NOS}
+plotNeighborsOrientation(NOS)
+```
+

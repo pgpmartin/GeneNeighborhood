@@ -102,7 +102,7 @@ set.seed(123)
 #Classes of gene pairs:
   table(GeneNeighbors$GenePair)
 
-#Up/DownstreamOrientation don't document overlaps of the upstream/downstream gene:
+#Up/DownstreamOrientation columns don't document overlaps of the upstream/downstream gene:
   table(GeneNeighbors$NeighborClass[GeneNeighbors$UpstreamOrientation=="O"])
 #This information is present in the Up/DownstreamClass columns:
   table(GeneNeighbors$NeighborClass[GeneNeighbors$DownstreamClass=="OppositeOverlap"])

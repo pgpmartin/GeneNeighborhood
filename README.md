@@ -128,3 +128,11 @@ We obtain the following table:
 | Downstream | OppositeStrand  |   40|       50.63|          248|                 47.88|    0.340|
 | Downstream | SameOverlap     |    4|        5.06|           31|                  5.98|    0.720|
 | Downstream | SameStrand      |   30|       37.97|          223|                 43.05|    0.870|
+
+We can plot the corresponding percentages using:
+
+``` r
+plotNeighborsOrientation(NOS)
+```
+
+<img src="man/figures/README-plotNeighborsOrientation NOS-1.png" width="100%" />
