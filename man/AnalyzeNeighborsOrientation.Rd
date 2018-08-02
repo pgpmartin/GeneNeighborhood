@@ -4,18 +4,13 @@
 \alias{AnalyzeNeighborsOrientation}
 \title{Analyze the orientation of gene neighbors for a set of pre-defined genes}
 \usage{
-AnalyzeNeighborsOrientation(GeneList, GeneNeighborhood = GeneNeighbors,
-  colNames = c(GeneName = "GeneName", Upstream = "Upstream", Downstream =
-  "Downstream", UpstreamClass = "UpstreamClass", DownstreamClass =
-  "DownstreamClass"), keepOther = TRUE, EnrichTest = TRUE,
-  GeneUniverse = NULL)
+AnalyzeNeighborsOrientation(GeneList, GeneNeighborhood = NULL,
+  keepOther = TRUE, EnrichTest = TRUE, GeneUniverse = NULL)
 }
 \arguments{
 \item{GeneList}{A character vector of focus genes to analyze}
 
-\item{GeneNeighborhood}{A tibble obtained with the GetGeneNeighborhood function. Can also be any data.frame with the relevant information.}
-
-\item{colNames}{A named character vector of length 5 containing the names of the columns from \code{GeneNeighborhood} containing the following information (in this order):
+\item{GeneNeighborhood}{A \code{\link{tibble}} obtained with the \code{\link{GetGeneNeighborhood}} function or any data frame containing the following columns:
 \itemize{
   \item \code{GeneName}. Name of the focus gene
   \item \code{Upstream}. Name of the gene located upstream of the focus gene
@@ -24,11 +19,11 @@ AnalyzeNeighborsOrientation(GeneList, GeneNeighborhood = GeneNeighbors,
   \item \code{DownstreamClass}. Class of the Downstream gene
 }}
 
-\item{keepOther}{A logical (default to \code{TRUE}) indicating if the category "other" should be analyzed or not}
+\item{keepOther}{A logical (default to \code{TRUE}) indicating if the class "other" should be analyzed or not}
 
 \item{EnrichTest}{A logical (default to \code{TRUE}) indicating if Enrichment test should be performed}
 
-\item{GeneUniverse}{An optional character vector of genes in the universe. By default all genes in GeneNeighborhood are considered in the Universe.}
+\item{GeneUniverse}{An optional character vector of genes in the universe. By default all genes in GeneNeighborhood are considered in the gene universe.}
 }
 \value{
 A \code{tibble} with orientation and distance for upstream/downstream gene.
@@ -41,7 +36,7 @@ Analyze the orientation of gene neighbors (upstream/downstream genes) for a set 
 }
 \section{DETAILS}{
 
-The function analyzes the following orientations:
+The function is intended to analyze the following orientations:
 \itemize{
   \item \code{SameStrand}. The upstream/downstream gene is on the same strand as the focus gene
   \item \code{OppositeStrand}. The upstream/downstream gene is on the opposite strand of the focus gene
@@ -49,6 +44,7 @@ The function analyzes the following orientations:
   \item \code{SameOverlap}. The upstream/downstream gene is on the same strand of the focus gene and overlaps with the focus gene
   \item \code{other}. (only if \code{keepOther} is \code{TRUE}) Any other, more complex situation (e.g. multiple overlaps, focus gene contained within another gene, etc.)
 }
+but should work with different class values too (except 'other' when \code{keepOther} is \code{TRUE})
 }
 
 \examples{
@@ -67,6 +63,10 @@ The function analyzes the following orientations:
   lessrandGenes <- GeneNeighbors$GeneName[sample.int(676, 100, prob=probs)]
   AnalyzeNeighborsOrientation(lessrandGenes,
                               GeneNeighborhood = GeneNeighbors)
+## Get statistics for the gene universe only
+  AnalyzeNeighborsOrientation(names(Genegr),
+                              GeneNeighborhood = GeneNeighbors,
+                              EnrichTest = FALSE)
 
 }
 \seealso{

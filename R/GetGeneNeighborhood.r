@@ -9,6 +9,7 @@
 #' @importFrom S4Vectors queryHits subjectHits
 #' @importFrom tibble tibble
 #' @importFrom dplyr left_join recode
+#' @importFrom methods is
 #'
 #' @export
 #'
@@ -100,7 +101,7 @@
 #' #Classes of gene pairs:
 #'   table(GeneNeighbors$GenePair)
 #'
-#' #UpstreamOrientation and DownstreamOrientation do not take into account potential overlaps of the upstream/downstream gene:
+#' #Up/DownstreamOrientation columns don't document overlaps of the upstream/downstream gene:
 #'   table(GeneNeighbors$NeighborClass[GeneNeighbors$UpstreamOrientation=="O"])
 #' #This information is present in the Up/DownstreamClass columns:
 #'   table(GeneNeighbors$NeighborClass[GeneNeighbors$DownstreamClass=="OppositeOverlap"])
