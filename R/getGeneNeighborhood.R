@@ -76,7 +76,7 @@
 #'
 #' @examples \dontrun{
 #' library(TxDb.Athaliana.BioMart.plantsmart25)
-#' GeneNeighbors <- GetGeneNeighborhood(GenomicFeatures::genes(TxDb.Athaliana.BioMart.plantsmart25))
+#' GeneNeighbors <- getGeneNeighborhood(GenomicFeatures::genes(TxDb.Athaliana.BioMart.plantsmart25))
 #' # There are 155 genes (0.461%) that overlap with >1 gene
 #' table(GeneNeighbors$NeighborClass)
 #' #
@@ -94,7 +94,7 @@
 #'   Genegr
 #'
 #' #Extract info on the neighbors of these genes:
-#'   GeneNeighbors <- GetGeneNeighborhood(Genegr)
+#'   GeneNeighbors <- getGeneNeighborhood(Genegr)
 #'
 #' #Classes of neighborhoods:
 #'   table(GeneNeighbors$NeighborClass)
@@ -107,7 +107,7 @@
 #'   table(GeneNeighbors$NeighborClass[GeneNeighbors$DownstreamClass=="OppositeOverlap"])
 #'
 
-GetGeneNeighborhood <- function(GeneGRanges) {
+getGeneNeighborhood <- function(GeneGRanges) {
 
 if (!is(GeneGRanges, "GRanges")) {
   stop("GeneGRanges should be a GRanges object")

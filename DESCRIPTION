@@ -1,6 +1,6 @@
 Package: GeneNeighborhood
 Type: Package
-Title: Analyze the neighborhood (upstream/downstream neighbors) of genes
+Title: Analyze the Neighborhood (Upstream/Downstream Neighbors) of Genes
 Version: 0.1.0
 Author: Pascal GP Martin
 Maintainer: Pascal GP Martin <pgp.martin@gmail.com>
@@ -12,6 +12,7 @@ LazyData: true
 Depends: 
  R (>= 3.1.0)
 Imports: 
+ coin,
  dplyr,
  GenomicRanges,
  ggplot2,

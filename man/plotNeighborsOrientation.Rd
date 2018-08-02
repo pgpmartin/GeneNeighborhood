@@ -7,7 +7,7 @@
 plotNeighborsOrientation(orientationStats)
 }
 \arguments{
-\item{orientationStats}{A data frame produced by the \code{\link{AnalyzeNeighborsOrientation}} function}
+\item{orientationStats}{A data frame produced by the \code{\link{analyzeNeighborsOrientation}} function}
 }
 \value{
 A \code{\link{ggplot}} object
@@ -27,12 +27,12 @@ The function only plots the following orientations, if present:
 }
 \examples{
 ## Obtain gene neighborhood information:
-  GeneNeighbors <- GetGeneNeighborhood(Genegr)
+  GeneNeighbors <- getGeneNeighborhood(Genegr)
 ## Define a (random) set of (100) genes:
   set.seed(123)
   randGenes <- names(Genegr)[sample.int(676, 100)]
 ## Analyze the orientation of their neighbors:
-  NOS <- AnalyzeNeighborsOrientation(randGenes, GeneNeighborhood = GeneNeighbors)
+  NOS <- analyzeNeighborsOrientation(randGenes, GeneNeighborhood = GeneNeighbors)
 ## Plot the results:
   plotNeighborsOrientation(NOS)
 }

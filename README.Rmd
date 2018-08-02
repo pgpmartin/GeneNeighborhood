@@ -43,6 +43,8 @@ library(dplyr)
 ```
   
 
+### Obtain data on the gene neighbors
+
 To run examples, the package includes a *GRanges* named **Genegr** that contains 676 genes with random coordinates on a single chromosome *Chr1*:
 ```{r gr data}
 Genegr
@@ -51,9 +53,11 @@ Genegr
 
 For each feature/gene, we extract information (orientation and distance, potential overlaps) about their upstream/downstream neighbors with:
 ```{r extract GeneNeighbors}
-GeneNeighbors <- GetGeneNeighborhood(Genegr)
+GeneNeighbors <- getGeneNeighborhood(Genegr)
 ```
   
+
+### Analyze the orientation of the genes' neighbors
   
 We define a random set of 100 genes:
 ```{r define random genes}
@@ -65,15 +69,15 @@ randGenes <- names(Genegr)[sample.int(676, 100)]
 We extract statistics about the orientation of their neighbors using:
 ```{r NOS random genes}
 ## Neighbors Orientation Statistics:
-NOS <- AnalyzeNeighborsOrientation(randGenes, 
+NOS <- analyzeNeighborsOrientation(randGenes, 
                                    GeneNeighborhood = GeneNeighbors)
 ```
   
   
-By default all genes are used as a universe and an enrichment test is performed.  
+By default all genes are used as a universe and an enrichment test is performed.   
 By default, the function also analyzes the *"other"* orientation which may be hard to interpret. We can remove this orientation using:
 ```{r NOS without other}
-NOS <- AnalyzeNeighborsOrientation(randGenes, 
+NOS <- analyzeNeighborsOrientation(randGenes, 
                                    GeneNeighborhood = GeneNeighbors,
                                    keepOther = FALSE)
 ```
@@ -90,7 +94,48 @@ NOS  %>%
   
   
 We can plot the corresponding percentages using:
-```{r plotNeighborsOrientation NOS}
+```{r plotOrientationNOS}
 plotNeighborsOrientation(NOS)
+```
+
+
+### Analyze the proximity of the genes' neighbors
+
+We can analyze specifically the distances to the upstream genes with:
+```{r}
+randUpstreamDist <- statDistanceSide(GeneNeighborhood = GeneNeighbors,
+                                     glist = randGenes,
+                                     Side = "Upstream")
+```
+
+Which gives the following (simplified) table:
+```{r randUpstreamDist kable, echo = FALSE}
+randUpstreamDist$stats  %>% 
+  dplyr::select(GeneGroup, SideClass, n, Median, Mean, SD, KS.pvalue:Independ.pvalue) %>%
+  dplyr::mutate(KS.pvalue = signif(KS.pvalue, 2),
+                Wilcox.pvalue = signif(Wilcox.pvalue, 2),
+                Independ.pvalue = signif(Independ.pvalue, 2)) %>%
+  knitr::kable(digits = c(1,1,1,2,2,2,300,300,300), 
+               format = "markdown",
+               caption="Upstream distances")
+```
+  
+  
+Or we directly analyze the distances to both upstream and downstream genes:
+```{r}
+randDist <- analyzeNeighborsDistance(GeneList = randGenes,
+                                     GeneNeighborhood = GeneNeighbors)
+```
+
+Which gives the following (simplified) table:
+```{r randDist kable, echo = FALSE}
+randDist$stats  %>% 
+  dplyr::select(GeneGroup:n, Median, Mean, SD, KS.pvalue:Independ.pvalue) %>%
+  dplyr::mutate(KS.pvalue = signif(KS.pvalue, 2),
+                Wilcox.pvalue = signif(Wilcox.pvalue, 2),
+                Independ.pvalue = signif(Independ.pvalue, 2)) %>%
+  knitr::kable(digits = c(1,1,1,1,2,2,2,300,300,300), 
+               format = "markdown",
+               caption="Upstream distances")
 ```
 

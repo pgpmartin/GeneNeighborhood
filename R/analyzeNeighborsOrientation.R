@@ -5,7 +5,7 @@
 #'  Evaluate the enrichment of the different orientations when using a reference gene universe.
 #'
 #' @param GeneList A character vector of focus genes to analyze
-#' @param GeneNeighborhood A \code{\link{tibble}} obtained with the \code{\link{GetGeneNeighborhood}} function or any data frame containing the following columns:
+#' @param GeneNeighborhood A \code{\link{tibble}} obtained with the \code{\link{getGeneNeighborhood}} function or any data frame containing the following columns:
 #' \itemize{
 #'   \item \code{GeneName}. Name of the focus gene
 #'   \item \code{Upstream}. Name of the gene located upstream of the focus gene
@@ -45,27 +45,27 @@
 #'
 #' @examples
 #' ## Obtain gene neighborhood information:
-#'   GeneNeighbors <- GetGeneNeighborhood(Genegr)
+#'   GeneNeighbors <- getGeneNeighborhood(Genegr)
 #' ## get a random set of 100 genes:
 #'   set.seed(123)
 #'   randGenes <- names(Genegr)[sample.int(676, 100)]
 #' ## Analyze the orientation of their neighbors
-#'   AnalyzeNeighborsOrientation(randGenes,
+#'   analyzeNeighborsOrientation(randGenes,
 #'                               GeneNeighborhood = GeneNeighbors)
 #' ## Select a less random set of genes:
 #'   isOpposite <- grepl("Opposite",GeneNeighbors$UpstreamClass)
 #'   probs <- ifelse(isOpposite, 0.6/sum(isOpposite), 0.4/sum(!isOpposite))
 #'   set.seed(123)
 #'   lessrandGenes <- GeneNeighbors$GeneName[sample.int(676, 100, prob=probs)]
-#'   AnalyzeNeighborsOrientation(lessrandGenes,
+#'   analyzeNeighborsOrientation(lessrandGenes,
 #'                               GeneNeighborhood = GeneNeighbors)
 #' ## Get statistics for the gene universe only
-#'   AnalyzeNeighborsOrientation(names(Genegr),
+#'   analyzeNeighborsOrientation(names(Genegr),
 #'                               GeneNeighborhood = GeneNeighbors,
 #'                               EnrichTest = FALSE)
 #'
 
-AnalyzeNeighborsOrientation <- function(GeneList,
+analyzeNeighborsOrientation <- function(GeneList,
                                         GeneNeighborhood = NULL,
                                         keepOther = TRUE,
                                         EnrichTest = TRUE,

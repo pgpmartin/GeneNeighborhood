@@ -2,7 +2,7 @@
 #'
 #' @description Plots stacked bars of the percentage of each orientation for the upstream and downstream genes.
 #'
-#' @param orientationStats A data frame produced by the \code{\link{AnalyzeNeighborsOrientation}} function
+#' @param orientationStats A data frame produced by the \code{\link{analyzeNeighborsOrientation}} function
 #'
 #' @importFrom ggplot2 ggplot aes_string geom_bar position_stack scale_fill_manual scale_y_continuous theme_bw theme element_text labs
 #'
@@ -24,12 +24,12 @@
 #'
 #' @examples
 #' ## Obtain gene neighborhood information:
-#'   GeneNeighbors <- GetGeneNeighborhood(Genegr)
+#'   GeneNeighbors <- getGeneNeighborhood(Genegr)
 #' ## Define a (random) set of (100) genes:
 #'   set.seed(123)
 #'   randGenes <- names(Genegr)[sample.int(676, 100)]
 #' ## Analyze the orientation of their neighbors:
-#'   NOS <- AnalyzeNeighborsOrientation(randGenes, GeneNeighborhood = GeneNeighbors)
+#'   NOS <- analyzeNeighborsOrientation(randGenes, GeneNeighborhood = GeneNeighbors)
 #' ## Plot the results:
 #'   plotNeighborsOrientation(NOS)
 #
