@@ -68,7 +68,7 @@ We define a random set of 100 genes:
 
 ``` r
 set.seed(123)
-randGenes <- names(Genegr)[sample.int(676, 100)]
+randGenes <- sample(names(Genegr), 100)
 ```
 
 We extract statistics about the orientation of their neighbors using:
@@ -77,20 +77,6 @@ We extract statistics about the orientation of their neighbors using:
 ## Neighbors Orientation Statistics:
 NOS <- analyzeNeighborsOrientation(randGenes, 
                                    GeneNeighborhood = GeneNeighbors)
-#> Total number of genes in GeneList: 100 
-#> Length of Gene Universe is 676 
-#> 
-#> Analysis of upstream gene orientation:
-#> ======================================
-#> Gene set for upstream gene analysis has 100 genes
-#> 2 genes from universe have missing data for upstream gene
-#> Universe for upstream gene analysis has 674 genes
-#> 
-#> Analysis of downstream gene orientation:
-#> ========================================
-#> Gene set for downstream gene analysis has 100 genes
-#> 1 genes from universe have missing data for downstream gene
-#> Universe for downstream gene analysis has 675 genes
 ```
 
 By default all genes are used as a universe and an enrichment test is performed.
@@ -149,15 +135,6 @@ We can analyze specifically the distances to the upstream genes with:
 randUpstreamDist <- statDistanceSide(GeneNeighborhood = GeneNeighbors,
                                      glist = randGenes,
                                      Side = "Upstream")
-#> 
-#> Analysis of Distances to upstream gene:
-#> ========================================
-#> 21 genes with undefined upstream gene are removed
-#> 8 genes with an overlapping upstream gene are removed from GeneList
-#> GeneList for upstream gene analysis has 71 genes
-#> 159 genes from GeneUniverse with undefined upstream gene are removed
-#> 66 genes from GeneUniverse with an overlapping upstream gene are removed
-#> Universe for upstream gene analysis has 451 genes
 ```
 
 Which gives the following (simplified) table:
@@ -174,29 +151,6 @@ Or we directly analyze the distances to both upstream and downstream genes:
 ``` r
 randDist <- analyzeNeighborsDistance(GeneList = randGenes,
                                      GeneNeighborhood = GeneNeighbors)
-#> 
-#> Prefiltering of GeneList and GeneUniverse:
-#> ==========================================
-#> Total number of genes in GeneList: 100 
-#> Total number of genes in GeneUniverse (including GeneList) is 676 
-#> 
-#> Analysis of Distances to upstream gene:
-#> ========================================
-#> 21 genes with undefined upstream gene are removed
-#> 8 genes with an overlapping upstream gene are removed from GeneList
-#> GeneList for upstream gene analysis has 71 genes
-#> 159 genes from GeneUniverse with undefined upstream gene are removed
-#> 66 genes from GeneUniverse with an overlapping upstream gene are removed
-#> Universe for upstream gene analysis has 451 genes
-#> 
-#> Analysis of Distances to downstream gene:
-#> ========================================
-#> 21 genes with undefined downstream gene are removed
-#> 9 genes with an overlapping downstream gene are removed from GeneList
-#> GeneList for downstream gene analysis has 70 genes
-#> 158 genes from GeneUniverse with undefined downstream gene are removed
-#> 47 genes from GeneUniverse with an overlapping downstream gene are removed
-#> Universe for downstream gene analysis has 471 genes
 ```
 
 Which gives the following (simplified) table:
@@ -327,3 +281,188 @@ Which gives the following (simplified) table:
 </tr>
 </tbody>
 </table>
+
+The function can also be used to extract intergenic distances for all genes (except those with overlapping genes):
+
+``` r
+alldist <- analyzeNeighborsDistance(GeneList = names(Genegr),
+                                    GeneNeighborhood = GeneNeighbors,
+                                    DistriTest = FALSE)
+```
+
+We can use these distances to preferentially select genes with a short upstream distance.
+First, we extract upstream distances:
+
+``` r
+updist <- alldist$distances$Distance[alldist$distances$Side=="Upstream"]
+names(updist) <- alldist$distances$GeneName[alldist$distances$Side=="Upstream"]
+```
+
+Then we define a probability of selecting the gene that is inversely proportional to its upstream distance:
+
+``` r
+probs <- (max(updist) - updist) / sum(max(updist) - updist)
+```
+
+Then select 100 genes using these probabilities:
+
+``` r
+set.seed(1234)
+lessRandGenes <- sample(names(updist), 100, prob=probs)
+```
+
+And finally analyze the intergenic distances with these genes' neighbors:
+
+``` r
+lessRandDist <- analyzeNeighborsDistance(GeneList = lessRandGenes,
+                                         GeneNeighborhood = GeneNeighbors)
+```
+
+We obtain the following (simplified) table:
+
+<table>
+<colgroup>
+<col width="12%" />
+<col width="10%" />
+<col width="14%" />
+<col width="4%" />
+<col width="7%" />
+<col width="6%" />
+<col width="6%" />
+<col width="9%" />
+<col width="13%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">GeneGroup</th>
+<th align="left">Side</th>
+<th align="left">Orientation</th>
+<th align="right">n</th>
+<th align="right">Median</th>
+<th align="right">Mean</th>
+<th align="right">SD</th>
+<th align="right">KS.pvalue</th>
+<th align="right">Wilcox.pvalue</th>
+<th align="right">Independ.pvalue</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">GeneList</td>
+<td align="left">Upstream</td>
+<td align="left">OppositeStrand</td>
+<td align="right">50</td>
+<td align="right">9.0</td>
+<td align="right">9.92</td>
+<td align="right">9.12</td>
+<td align="right">0.26000</td>
+<td align="right">4.8e-02</td>
+<td align="right">0.03100</td>
+</tr>
+<tr class="even">
+<td align="left">GeneList</td>
+<td align="left">Upstream</td>
+<td align="left">SameStrand</td>
+<td align="right">50</td>
+<td align="right">5.0</td>
+<td align="right">8.52</td>
+<td align="right">9.05</td>
+<td align="right">0.00038</td>
+<td align="right">8.9e-05</td>
+<td align="right">0.00051</td>
+</tr>
+<tr class="odd">
+<td align="left">GeneUniverse</td>
+<td align="left">Upstream</td>
+<td align="left">OppositeStrand</td>
+<td align="right">236</td>
+<td align="right">10.0</td>
+<td align="right">13.30</td>
+<td align="right">12.43</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GeneUniverse</td>
+<td align="left">Upstream</td>
+<td align="left">SameStrand</td>
+<td align="right">215</td>
+<td align="right">11.0</td>
+<td align="right">14.47</td>
+<td align="right">13.80</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GeneList</td>
+<td align="left">Downstream</td>
+<td align="left">OppositeStrand</td>
+<td align="right">39</td>
+<td align="right">8.0</td>
+<td align="right">14.00</td>
+<td align="right">17.84</td>
+<td align="right">0.30000</td>
+<td align="right">3.3e-01</td>
+<td align="right">0.78000</td>
+</tr>
+<tr class="even">
+<td align="left">GeneList</td>
+<td align="left">Downstream</td>
+<td align="left">SameStrand</td>
+<td align="right">50</td>
+<td align="right">12.5</td>
+<td align="right">16.18</td>
+<td align="right">13.35</td>
+<td align="right">0.94000</td>
+<td align="right">3.2e-01</td>
+<td align="right">0.43000</td>
+</tr>
+<tr class="odd">
+<td align="left">GeneUniverse</td>
+<td align="left">Downstream</td>
+<td align="left">OppositeStrand</td>
+<td align="right">248</td>
+<td align="right">10.0</td>
+<td align="right">14.65</td>
+<td align="right">15.66</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GeneUniverse</td>
+<td align="left">Downstream</td>
+<td align="left">SameStrand</td>
+<td align="right">223</td>
+<td align="right">12.0</td>
+<td align="right">14.85</td>
+<td align="right">13.69</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+
+Before plotting, we need to assemble the distances for different groups of genes in a single data frame:
+
+``` r
+mydist <- rbind.data.frame(alldist$distances,
+                           randDist$distances,
+                           lessRandDist$distances)
+mydist$GeneSet <- rep(c("All Genes", "Random Genes", "Less Random genes"),
+                      times = c(nrow(alldist$distances), 
+                                nrow(randDist$distances), 
+                                nrow(lessRandDist$distances)))
+```
+
+Now, we can plot the distribution of intergenic distances for these sets of genes:
+
+``` r
+plotDistanceDensities(mydist)
+```
+
+<img src="man/figures/README-plotDistanceDensities-1.png" width="100%" />

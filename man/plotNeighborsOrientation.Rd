@@ -30,7 +30,7 @@ The function only plots the following orientations, if present:
   GeneNeighbors <- getGeneNeighborhood(Genegr)
 ## Define a (random) set of (100) genes:
   set.seed(123)
-  randGenes <- names(Genegr)[sample.int(676, 100)]
+  randGenes <- sample(names(Genegr), 100)
 ## Analyze the orientation of their neighbors:
   NOS <- analyzeNeighborsOrientation(randGenes, GeneNeighborhood = GeneNeighbors)
 ## Plot the results:

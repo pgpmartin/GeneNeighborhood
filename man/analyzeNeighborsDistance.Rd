@@ -55,7 +55,7 @@ The function should thus return results for the following orientations:
   GeneNeighbors <- getGeneNeighborhood(Genegr)
 ## Get a (random) set of (100) genes:
   set.seed(123)
-  randGenes <- names(Genegr)[sample.int(676, 100)]
+  randGenes <- sample(names(Genegr), 100)
 ## Extract all distances and compare them to reference genes:
   NDS <- analyzeNeighborsDistance(GeneList = randGenes,
                                   GeneNeighborhood = GeneNeighbors)

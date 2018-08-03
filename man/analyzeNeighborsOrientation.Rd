@@ -52,7 +52,7 @@ but should work with different class values too (except 'other' when \code{keepO
   GeneNeighbors <- getGeneNeighborhood(Genegr)
 ## get a random set of 100 genes:
   set.seed(123)
-  randGenes <- names(Genegr)[sample.int(676, 100)]
+  randGenes <- sample(names(Genegr), 100)
 ## Analyze the orientation of their neighbors
   analyzeNeighborsOrientation(randGenes,
                               GeneNeighborhood = GeneNeighbors)
@@ -60,7 +60,7 @@ but should work with different class values too (except 'other' when \code{keepO
   isOpposite <- grepl("Opposite",GeneNeighbors$UpstreamClass)
   probs <- ifelse(isOpposite, 0.6/sum(isOpposite), 0.4/sum(!isOpposite))
   set.seed(123)
-  lessrandGenes <- GeneNeighbors$GeneName[sample.int(676, 100, prob=probs)]
+  lessrandGenes <- GeneNeighbors$GeneName[sample.int(nrow(GeneNeighbors), 100, prob=probs)]
   analyzeNeighborsOrientation(lessrandGenes,
                               GeneNeighborhood = GeneNeighbors)
 ## Get statistics for the gene universe only

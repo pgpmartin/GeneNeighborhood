@@ -44,7 +44,7 @@ When  following \code{distest} is \code{TRUE}, the following tests are performed
   GeneNeighbors <- getGeneNeighborhood(Genegr)
 ## Get a (random) set of (100) genes:
   set.seed(123)
-  randGenes <- names(Genegr)[sample.int(676, 100)]
+  randGenes <- sample(names(Genegr), 100)
 ## Extract their upstream distances and compare to non selected genes:
   statDistanceSide(GeneNeighborhood = GeneNeighbors,
                    glist = randGenes,

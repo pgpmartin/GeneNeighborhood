@@ -16,13 +16,15 @@ Imports:
  dplyr,
  GenomicRanges,
  ggplot2,
+ ggridges,
  IRanges,
  magrittr,
  methods,
  rlang,
  S4Vectors,
  stats,
- tibble
+ tibble,
+ utils
 Suggests: 
  knitr,
  TxDb.Athaliana.BioMart.plantsmart25
