@@ -14,6 +14,7 @@ Depends:
 Imports: 
  coin,
  dplyr,
+ GenomeInfoDb,
  GenomicRanges,
  ggplot2,
  ggridges,
