@@ -22,6 +22,8 @@
 #'  The remaining features are sliced into \code{nbins} (possibly different bin sizes for different features) or into bins of size \code{binwidth} (possibly different number of bins for different features).
 #'  Then the data in each bins is aggregated using the aggregFUN function
 #'
+#' @seealso profcomp AnnotationCoverageAroundFeatures
+#'
 #' @examples
 #' ## Obtain coverage for all genes:
 #'   covr <- GenomicRanges::coverage(Genegr)
@@ -57,7 +59,7 @@ BinFeatureProfiles <- function(FeatureProfiles,
   }
 
   if (missing(nbins) && missing(binwidth)) {
-    cat("Working with 100 bins (default). Note that different features may have different bin sizes\n")
+    message("Working with 100 bins (default). Note that different features may have different bin sizes\n")
   }
 
   if (!missing(nbins) && (length(nbins) != 1 || any(is.na(nbins)))) {
@@ -107,12 +109,12 @@ BinFeatureProfiles <- function(FeatureProfiles,
   if (FixedNumBin){
     FeatureIsOK <- FeatureLengths >= nbins
     if (sum(!FeatureIsOK) > 0) {
-      cat("Removing", sum(!FeatureIsOK), "features of size lower than", nbins, "bp\n")
+      message("Removing ", sum(!FeatureIsOK), " features of size lower than ", nbins, "bp")
     }
   } else {
     FeatureIsOK <- FeatureLengths >= binwidth
     if (sum(!FeatureIsOK) > 0) {
-      cat("Removing", sum(!FeatureIsOK), "features of size lower than", binwidth, "bp\n")
+      message("Removing ", sum(!FeatureIsOK), " features of size lower than ", binwidth, "bp")
     }
   }
 
@@ -127,11 +129,11 @@ BinFeatureProfiles <- function(FeatureProfiles,
                                                                  end = FeatureLengths),
                                                 n = nbins))
     avgtilewidth <- IRanges::mean(S4Vectors::width(tileFeatures))
-    cat("Bin size is:",
-        round(mean(avgtilewidth), 2),
-        "+/-",
-        round(sd(avgtilewidth), 2),
-        "bp (mean +/- sd)\n")
+    message("Bin size is: ",
+            round(mean(avgtilewidth), 2),
+            " +/- ",
+            round(sd(avgtilewidth), 2),
+            "bp (mean +/- sd)")
 
   } else {
 
@@ -139,9 +141,9 @@ BinFeatureProfiles <- function(FeatureProfiles,
                        tile(IRanges(start = 1,
                                     end = FeatureLengths),
                             width = binwidth))
-    cat("Average number of bins is:",
-        round(mean(S4Vectors::elementNROWS(S4Vectors::width(tileFeatures))), 2),
-        "bins\n")
+    message("Average number of bins is: ",
+            round(mean(S4Vectors::elementNROWS(S4Vectors::width(tileFeatures))), 2),
+            " bins")
   }
 
 

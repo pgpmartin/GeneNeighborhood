@@ -7,7 +7,7 @@
 getTES(gr)
 }
 \arguments{
-\item{gr}{GRanges.}
+\item{gr}{A \code{\link{GRanges}}.}
 }
 \value{
 A GRanges of the TES positions

@@ -55,6 +55,9 @@ Bin coverage profiles given as a matrix or RleList of profiles.
   BinFeatureProfiles(profs[1:3], aggregFUN=mymean, nbins=10, asMatrix = TRUE)
 
 }
+\seealso{
+profcomp AnnotationCoverageAroundFeatures
+}
 \author{
 Pascal GP Martin
 }

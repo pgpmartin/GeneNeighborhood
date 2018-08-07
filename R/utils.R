@@ -76,10 +76,9 @@ profcomp <- function(covr=NULL, woi=NULL) {
 
 
 #' @title Extract the TES (=end of the gene) from a \code{\link{GRanges}}
-
 #' @description Extract the TES (=end of the gene) from a \code{\link{GRanges}}
 #'
-#' @param gr GRanges.
+#' @param gr A \code{\link{GRanges}}.
 #'
 #' @importFrom GenomicRanges strand promoters
 #'
@@ -119,6 +118,82 @@ getTES <- function(gr) {
 
   return(tes)
 }
+
+
+
+#' Extract a region around the TES (=end of the gene) from a \code{\link{GRanges}}
+#'
+#' @param gr A \code{\link{GRanges}}.
+#' @param upstream An integer defining the distance upstream of the TES to extract.
+#' @param downstream An integer defining the distance downstream of the TES to extract.
+#' @param limitToTSS A logical (default to FALSE) indicating if ranges should be trimmed to don't extend upstream of the TSS
+#' @param trim A logical (default to FALSE) indicating if out-of-bound ranges should be trimmed (see ?`trim,GenomicRanges-method`)
+#'
+#' @importFrom GenomicRanges strand promoters trim start end
+#'
+#' @export
+#'
+#' @return A GRanges of regions around the TES positions.
+#'
+#' @section DETAILS:
+#' The TES is defined as start(gr) when strand(gr)=="+" and as end(gr) when strand(gr)=="-"
+#' The function considers that strand=="*" is equivalent to strand=="+"
+#' To extract 500bp on each side of the TES, use \code{upstream=500} and \code{downstream=501}
+#'
+#'@seealso promoters flank ?`trim,GenomicRanges-method`
+#'
+#' @examples
+#' ## Get a 50bp region on each side of the TSS of genes in GeneGR:
+#'   suppressWarnings(GenomicRanges::promoters(Genegr, upstream = 50, downstream = 51))
+#' ## Same around the TES:
+#'   suppressWarnings(getTESregion(Genegr, upstream = 50, downstream = 51))
+#' ## Do not extend regions beyond the TSS or Chr1 borders
+#'   getTESregion(Genegr, upstream = 50, downstream = 51, limitToTSS = TRUE, trim = TRUE)
+#'
+#' @author Pascal GP Martin
+
+getTESregion <- function(gr, upstream=500L, downstream=501L, limitToTSS = FALSE, trim = FALSE) {
+  ## Check for undefined strand
+  isStar <- as.logical(GenomicRanges::strand(gr)=="*")
+  if (any(isStar)) {
+    message("'*' ranges were treated as '+' ranges")
+  }
+
+  ## Reverse gr strand
+  revgr <- gr
+  GenomicRanges::strand(revgr) <- ifelse(as.logical(GenomicRanges::strand(gr)=="-"), "+", "-")
+
+  ## Get TES region coordinates
+if (trim) {
+  tesRegion <- suppressWarnings(GenomicRanges::promoters(revgr,
+                                                         upstream = downstream-1,
+                                                         downstream = upstream+1))
+} else {
+  tesRegion <- GenomicRanges::promoters(revgr,
+                                        upstream = downstream-1,
+                                        downstream = upstream+1)
+}
+
+  ## Reverse back the strand
+  GenomicRanges::strand(tesRegion) <- GenomicRanges::strand(gr)
+
+  ## Correct the borders if limitToTSS is TRUE
+  if (limitToTSS) {
+    GenomicRanges::start(tesRegion) <- ifelse(as.logical(GenomicRanges::strand(gr)=="+"),
+                                              pmax(GenomicRanges::start(gr), GenomicRanges::start(tesRegion)),
+                                              GenomicRanges::start(tesRegion))
+    GenomicRanges::end(tesRegion) <- ifelse(as.logical(GenomicRanges::strand(gr)=="+"),
+                                            GenomicRanges::end(tesRegion),
+                                            pmin(GenomicRanges::end(gr), GenomicRanges::end(tesRegion)))
+  }
+
+  #Limit the region to chromosome borders:
+  if (trim) {
+    tesRegion=GenomicRanges::trim(tesRegion)
+  }
+  return(tesRegion)
+}
+
 
 #' @title Convert an \code{RleList} to a \code{matrix}
 #'
