@@ -18,7 +18,7 @@ annotationCoverageAroundFeatures(annot, features = NULL,
 
 \item{BinFeatures}{Logical. Should \code{features} be binned? Default to TRUE and will be forced to TRUE if \code{features} have different width.}
 
-\item{...}{additional arguments passed to \code{\link{BinFeatureProfiles}}}
+\item{...}{additional arguments passed to \code{\link{binFeatureProfiles}}}
 }
 \value{
 A list with the following elements:
@@ -47,7 +47,7 @@ AllProf <- annotationCoverageAroundFeatures(Genegr, sidedist = 50, usePercent = 
 
 }
 \seealso{
-\code{\link{BinFeatureProfiles}}
+\code{\link{binFeatureProfiles}}
 }
 \author{
 Pascal GP Martin

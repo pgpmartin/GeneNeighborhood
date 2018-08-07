@@ -1,6 +1,6 @@
 #' Bin coverage profiles given as a matrix or RleList of profiles.
 #'
-#' @param FeatureProfiles A \code{\link{matrix}} (with features in row and genomic positions in column) or \code{\link{RleList}}, typically obtained with the \code{\link[GeneNeighborhood]{profcomp}} function.
+#' @param FeatureProfiles A \code{\link{matrix}} (with features in row and genomic positions in column) or \code{\link{RleList}}, typically obtained with the \code{\link{profcomp}} function.
 #' @param nbins Integer. Number of bins to define along each feature. Default value is 100 bins.
 #' @param binwidth Integer. Size of the bins to define on the features. Default value is NULL and 100 bins are used instead.
 #' @param aggregFUN A character string (or a function name), such as "median", "mean", etc., with the name of a function used to aggregate the data within the bins. Defaults to "mean".
@@ -22,7 +22,7 @@
 #'  The remaining features are sliced into \code{nbins} (possibly different bin sizes for different features) or into bins of size \code{binwidth} (possibly different number of bins for different features).
 #'  Then the data in each bins is aggregated using the aggregFUN function
 #'
-#' @seealso profcomp AnnotationCoverageAroundFeatures
+#' @seealso \code{\link{profcomp}} \code{\link{annotationCoverageAroundFeatures}}
 #'
 #' @examples
 #' ## Obtain coverage for all genes:
@@ -35,18 +35,18 @@
 #' ## Coverage on these windows of interest:
 #'   profs <- profcomp(covr, woi)
 #' ## Make 10 bins:
-#'   BinFeatureProfiles(profs, nbins = 10)
+#'   binFeatureProfiles(profs, nbins = 10)
 #' ## Return a matrix instead:
-#'   BinFeatureProfiles(profs[1:3], nbins=10, asMatrix = TRUE)
+#'   binFeatureProfiles(profs[1:3], nbins=10, asMatrix = TRUE)
 #' ## Make bins of size 20bp:
-#'   BinFeatureProfiles(profs, binwidth=20)
+#'   binFeatureProfiles(profs, binwidth=20)
 #' ##use your own function to aggregate the data within the bins
 #'   mymean <- function(x) {mean(as.numeric(x), trim=0.1)}
-#'   BinFeatureProfiles(profs[1:3], aggregFUN=mymean, nbins=10, asMatrix = TRUE)
+#'   binFeatureProfiles(profs[1:3], aggregFUN=mymean, nbins=10, asMatrix = TRUE)
 #'
 #' @author Pascal GP Martin
 
-BinFeatureProfiles <- function(FeatureProfiles,
+binFeatureProfiles <- function(FeatureProfiles,
                                nbins = 100L,
                                binwidth = NULL,
                                aggregFUN = "mean",

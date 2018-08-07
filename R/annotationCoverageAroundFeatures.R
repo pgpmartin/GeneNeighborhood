@@ -5,7 +5,7 @@
 #' @param sidedist Integer. Distance on each side of features at which to extract the profiles
 #' @param usePercent Logical. Should annotation coverage be expressed as presence/absence (0/1)? (instead of counting the number of features aligning at each position)
 #' @param BinFeatures Logical. Should \code{features} be binned? Default to TRUE and will be forced to TRUE if \code{features} have different width.
-#' @param ... additional arguments passed to \code{\link{BinFeatureProfiles}}
+#' @param ... additional arguments passed to \code{\link{binFeatureProfiles}}
 #'
 #' @importFrom GenomicRanges strand coverage reduce width trim promoters
 #' @importFrom S4Vectors Rle
@@ -28,7 +28,7 @@
 #'   \item \code{DownstreamBorder_Antisense}: Coverage of annot around (+/- sidedist) the downstream border of features, on the antisense strand
 #' }
 #'
-#' @seealso \code{\link{BinFeatureProfiles}}
+#' @seealso \code{\link{binFeatureProfiles}}
 #'
 #' @examples
 #' ## Extract the profiles around (+/-50bp) all genes. We bin the genes in 3 bins only.
@@ -167,7 +167,7 @@ if (usePercent) {
   }
 
   if (BinFeatures) {
-    message("Features are binned using BinFeatureProfiles")
+    message("Features are binned using binFeatureProfiles")
     ##Define the kind of binning performed (nbins or binwidth) and if isNBins, the number of bins used
     supArgs <- list(...)
     if (length(supArgs)==0) {
@@ -200,11 +200,11 @@ if (usePercent) {
                            "CompressedRleList")
       names(prof_woi_sense) <- nn
     } else {
-      prof_woi_sense <- BinFeatureProfiles(prof_woi_sense, ...)
+      prof_woi_sense <- binFeatureProfiles(prof_woi_sense, ...)
     }
 
     ## Get the antisense strand profile
-    prof_woi_antisense <- BinFeatureProfiles(prof_woi_antisense, ...)
+    prof_woi_antisense <- binFeatureProfiles(prof_woi_antisense, ...)
 
     #Features of width<NBins are removed so we filter and order the upstream and downstream profiles accordingly
     nmwoi <- names(prof_woi_sense)
