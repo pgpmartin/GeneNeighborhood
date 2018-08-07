@@ -20,23 +20,23 @@
 #' @return
 #' A list with the following elements:
 #' \itemize{
-#'   \item{"Feature_Sense"}{Coverage of annot (possibly binned) at features, on the sense strand (i.e. the strand of the feature)}
-#'   \item{"Feature_Antisense"}{Coverage of annot (possibly binned) at features, on the antisense strand (i.e. the opposite strand of features)}
-#'   \item{"UpstreamBorder_Sense"}{Coverage of annot around (+/- sidedist) the upstream border of features (Typically the TSS), on the sense strand}
-#'   \item{"UpstreamBorder_Antisense"}{Coverage of annot around (+/- sidedist) the upstream border of features, on the antisense strand}
-#'   \item{"DownstreamBorder_Sense"}{Coverage of annot around (+/- sidedist) the downstream border of features (Typically the TES), on the sense strand}
-#'   \item{"DownstreamBorder_Antisense"}{Coverage of annot around (+/- sidedist) the downstream border of features, on the antisense strand}
+#'   \item \code{Feature_Sense}: Coverage of annot (possibly binned) at features, on the sense strand (i.e. the strand of the feature)
+#'   \item \code{Feature_Antisense}: Coverage of annot (possibly binned) at features, on the antisense strand (i.e. the opposite strand of features)
+#'   \item \code{UpstreamBorder_Sense}: Coverage of annot around (+/- sidedist) the upstream border of features (Typically the TSS), on the sense strand
+#'   \item \code{UpstreamBorder_Antisense}: Coverage of annot around (+/- sidedist) the upstream border of features, on the antisense strand
+#'   \item \code{DownstreamBorder_Sense}: Coverage of annot around (+/- sidedist) the downstream border of features (Typically the TES), on the sense strand
+#'   \item \code{DownstreamBorder_Antisense}: Coverage of annot around (+/- sidedist) the downstream border of features, on the antisense strand
 #' }
 #'
-#' @seealso BinFeatureProfiles
+#' @seealso \code{\link{BinFeatureProfiles}}
 #'
 #' @examples
 #' ## Extract the profiles around (+/-50bp) all genes. We bin the genes in 3 bins only.
-#' AllProf <- AnnotationCoverageAroundFeatures(Genegr, sidedist = 50, usePercent = TRUE, nbins=3)
+#' AllProf <- annotationCoverageAroundFeatures(Genegr, sidedist = 50, usePercent = TRUE, nbins=3)
 #'
 #' @author Pascal GP Martin
 
-AnnotationCoverageAroundFeatures <- function(annot,
+annotationCoverageAroundFeatures <- function(annot,
                                              features = NULL,
                                              sidedist = 2000L,
                                              usePercent = FALSE,
