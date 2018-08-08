@@ -12,20 +12,22 @@ LazyData: true
 Depends: 
  R (>= 3.1.0)
 Imports: 
- coin,
- dplyr,
- GenomeInfoDb,
- GenomicRanges,
- ggplot2,
- ggridges,
- IRanges,
- magrittr,
- methods,
- rlang,
- S4Vectors,
- stats,
- tibble,
- utils
+    binom,
+    coin,
+    dplyr,
+    GenomeInfoDb,
+    GenomicRanges,
+    ggplot2,
+    ggridges,
+    IRanges,
+    magrittr,
+    matrixStats,
+    methods,
+    rlang,
+    S4Vectors,
+    stats,
+    tibble,
+    utils
 Suggests: 
  knitr,
  TxDb.Athaliana.BioMart.plantsmart25

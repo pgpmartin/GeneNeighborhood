@@ -19,6 +19,10 @@
 #'   x <- matrix(rnorm(1e4), ncol=100)
 #' ## Replace the top and bottom 1% extreme values by the corresponding quantiles:
 #'   y <- winsorizeMatrix(x, low=1, high=99, verbose = TRUE)
+#' ## Add some NA in x:
+#'   x[x>2] <- NA
+#' ## winsorizeMatrix still works
+#'   y <- winsorizeMatrix(x, low=1, high=99, verbose = TRUE)
 
 winsorizeMatrix <- function(mat,
                             low = 1,
