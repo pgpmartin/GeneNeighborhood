@@ -49,6 +49,8 @@
 #'   plot(1:105, avgProf_sense$Profile,
 #'        type="l", axes = FALSE,
 #'        xlab="Position", ylab="Percent")
+#'   lines(1:105, avgProf_sense$Upper, lty=2, col="grey")
+#'   lines(1:105, avgProf_sense$Lower, lty=2, col="grey")
 #'   axis(side=2)
 #'   axis(side=1, at=c(1,51,55,105),
 #'        labels=c("-50bp", "TSS", "TES", "+50bp"),
