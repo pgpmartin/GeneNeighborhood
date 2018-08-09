@@ -278,3 +278,31 @@ if (is.null(mat)) {
   as(apply(mat, 1 , Rle), "RleList")
 }
 
+
+#' @title Test if a matrix is a binary matrix
+#'
+#' @description Test if a matrix is a binary matrix (i.e. contains only 0s and 1s (with possibly NA).
+#'              Adapted from https://stackoverflow.com/a/23276062
+#'
+#' @param mat A matrix. If mat is a data frame it will be converted by data.matrix with a warning.
+#'
+#' @return A logical. TRUE if the matrix is binary, FALSE otherwise
+#' @export
+#'
+#' @examples
+#' set.seed(123)
+#' x <- matrix(rnorm(100), ncol= 10) # not a binary matrix
+#' y <- matrix(sample(0:1, 100, rep=TRUE), ncol=10) # a binary matrix
+#' z <- y ; z[x>1.5] <- NA #a binary matrix with some NA
+#' isBinaryMat(x) #FALSE
+#' isBinaryMat(y) #TRUE
+#' isBinaryMat(z) #TRUE
+isBinaryMat <- function(mat) {
+  stopifnot(is.matrix(mat) | is.data.frame(mat))
+  if (is.data.frame(mat)) {
+    mat <- data.matrix(mat)
+    warning("mat is a data.frame. A conversion was attempted using data.matrix")
+  }
+  return(identical(as.numeric(mat), as.numeric(as.logical(mat))))
+}
+

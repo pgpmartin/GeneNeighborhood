@@ -134,9 +134,8 @@ getAvgProfileWithCI <- function(FeatureProfiles,
     FeatureProfiles <- RleList2matrix(FeatureProfiles)
   }
 
-#Determine if FeaturesProfiles is binary (see https://stackoverflow.com/a/23276062)
-  isBinary <- identical(as.vector(FeatureProfiles),
-                        as.numeric(as.logical(FeatureProfiles)))
+#Determine if FeaturesProfiles is binary (see utils.R)
+  isBinary <- isBinaryMat(FeatureProfiles)
 
   ##Add rownames if NULL:
   featNames <- rownames(FeatureProfiles)

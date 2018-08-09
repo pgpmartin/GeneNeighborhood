@@ -23,6 +23,7 @@ Imports:
     magrittr,
     matrixStats,
     methods,
+    reshape2,
     rlang,
     S4Vectors,
     stats,

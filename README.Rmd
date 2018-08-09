@@ -279,4 +279,38 @@ avgProf_df <- reshape2::melt(avgProf,
 ```{r plotMetageneProfile}
 plotMetageneAnnotProfile(avgProf_df)
 ```
+
+   
+   
+### Distance to single-point features
+  
+  One limitation of these average profiles is that all the length of the genes/features are taken into account to produce the profiles. Sometimes, we are interested only in one part of this information. For example, we may want to know how many genes (or what fraction of genes) have a TSS, on the same strand, at less than 20bp from their end? The metagene profiles above can provide an approximation but not the true value because some features actually start and end within this interval.
+  The TSSs are *single-point features*. We can produce a coverage of the TSS using:
+```{r tsscov}
+#First obtain the coordinates of the TSS:
+tss <- GenomicRanges::promoters(Genegr, upstream = 0, downstream = 1)
+#Then the coverage of TSSs around (+/- 50bp) the genes
+tsscov <- annotationCoverageAroundFeatures(annot = tss, 
+                                           features = Genegr, 
+                                           sidedist = 50, 
+                                           usePercent = TRUE,
+                                           nbins = 3)
+```
+But metagene plots as above will not work well because the data is too sparse.   
+Instead, once a TSS is found at, say 5bp downstream of a gene border, we would like to extend its "presence" value (1) to any distance larger than 5bp to indicate that this specific gene has a TSS at less than any distance larger than 5. We do this using:
+```{r extendPointPresence}
+extTSScov <- extendPointPresence(tsscov, sidedist = 50)
+```
+
+Now for different groups of genes we can obtain the cumulative percentage of genes that have a TSS at less than a given distance with:
+```{r getCumulPercentProfiles}
+CP <- getCumulPercentProfiles(extTSScov,
+                              genesets = GeneGroups)
+```
+   
+   
+  And plot the results with:
+```{r plotCumulPercentProfile}
+plotCumulPercentProfile(CP)
+```
   
