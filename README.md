@@ -466,3 +466,97 @@ plotDistanceDensities(mydist)
 ```
 
 <img src="man/figures/README-plotDistanceDensities-1.png" width="100%" />
+
+### Metagene profiles
+
+Another way to study the neighborhood of a set of genes is to produce an average profiles representing the coverage of annotations in regions surrounding this set of genes. Such representation provides information on both the orientation and the distance of the neighbors. It also allows to compare different groups of genes (e.g. upregulated genes, genes with a ChIP-seq peak or a specific transcription factor motif in their promoter, etc...).
+
+First we extract the profiles of annotations around (+/-50bp) all our "mock" genes.
+We use 3 bins to summarize the coverage on the gene body so genes of size &lt;3bp are removed.
+We also use the argument *usePercent=TRUE* so that the profiles only indicate the presence/absence (0/1) of an annotation at a position rather than the number of genes that cover this position.
+
+``` r
+usePercent = TRUE
+Prof <- annotationCoverageAroundFeatures(Genegr,
+                                         sidedist = 50,
+                                         usePercent = usePercent,
+                                         nbins=3)
+#> 4 windows exceeding chromosome borders are removed
+#> Features are binned using binFeatureProfiles
+#> Removing 136 features of size lower than 3bp
+#> Bin size is: 2.13 +/- 0.74bp (mean +/- sd)
+```
+
+The object that is created by this function contains the following elements:
+
+    #> Feature_Sense
+    #> Feature_Antisense
+    #> UpstreamBorder_Sense
+    #> UpstreamBorder_Antisense
+    #> DownstreamBorder_Sense
+    #> DownstreamBorder_Antisense
+
+They represent the strand-specific coverage of annotations on the gene body (*Feature*), in the region (-50bp to the start of the gene) located upstream of the genes (*UpstreamBorder*) and in the region (end of the gene to +50bp) located downstream of the genes (*DownstreamBorder*).
+The *Sense* strand is the strand on which the focus gene (*Feature*) is annotated and the *Antisense* strand is the opposite strand.
+Because we used *usePercent=TRUE*, the *Feature\_Sense* profiles will only contain 1s, indicating the presence of annotation(s) all along the body of each focus gene (i.e. annotation of the focus gene itself). When *usePercent=FALSE*, values &gt;1 can occur in these profile, when the focus gene overlaps with other genes annotated on the same strand.
+
+Then, we assemble these different elements in order to produce a vector for each focus gene containing the upstream region (-50bp to the TSS), the gene body itself and the downstream region (TES to +50bp).
+
+``` r
+Prof <- assembleProfiles(Prof)
+```
+
+Now we define a group of genes that have neighbors, on the same strand, at a short distance.
+
+``` r
+#Get distances to the closest gene on the same strand:
+Dist2Nearest <- mcols(distanceToNearest(Genegr))$distance
+CloseTandemNeighbors <- names(Genegr)[Dist2Nearest<=8]
+```
+
+We assemble the different groups of genes that we have defined so far in a list:
+
+``` r
+GeneGroups <- list(All = names(Genegr),
+                   Random = randGenes,
+                   CloseNeighbors = CloseTandemNeighbors)
+```
+
+Then, for each group of genes, we calculate the average profile and its 95% confidence interval:
+
+``` r
+avgProf <- list()
+for (i in 1:length(GeneGroups)) {
+  avgProf[[i]] <- list()
+  avgProf[[i]]$sense <- getAvgProfileWithCI(Prof$Profiles_Sense,
+                                            selFeatures = GeneGroups[[i]],
+                                            pos = c(-50:0, 1:3, 0:50))
+  avgProf[[i]]$antisense <- getAvgProfileWithCI(Prof$Profiles_Antisense,
+                                                selFeatures = GeneGroups[[i]],
+                                                pos = c(-50:0, 1:3, 0:50))
+}
+names(avgProf) <- names(GeneGroups)
+```
+
+Before plotting, we need to assemble these profiles in a single table and to provide the x-coordinates for these "metagene" profiles (in the interval \[0,5\] with the gene body occupying coordinates \]2,3\[).
+
+``` r
+#Define the x-coordinates (the 3 sequences correspond to "Upstream", "GeneBody" and "Downstream")
+xcoord = c(seq(0, 2, length.out = 51),
+           seq(2, 3, length.out = 5)[2:4],
+           seq(3, 5, length.out = 51))
+#Assemble the metagene profiles
+avgProf_df <- reshape2::melt(avgProf,
+                             measure.vars = "Profile", value.name = "Profile") %>%
+                  dplyr::rename("Strand" = "L2",
+                                "GeneSet" = "L1") %>%
+                  dplyr::mutate(Xcoord=rep(xcoord, 2*length(GeneGroups)))
+```
+
+Now we can plot these profiles using:
+
+``` r
+plotMetageneAnnotProfile(avgProf_df)
+```
+
+<img src="man/figures/README-plotMetageneProfile-1.png" width="100%" />

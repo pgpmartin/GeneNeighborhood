@@ -36,12 +36,12 @@
 #'                                                  usePercent = TRUE,
 #'                                                  nbins=3)
 #' ## Assemble the metagene profiles
-#'   metaProf <- assembleMetagene(top200Prof)
+#'   Prof <- assembleProfiles(top200Prof)
 #' ## Select a set of 50 random genes within the top200
 #'   set.seed(123)
 #'   randGenes <- sample(names(Genegr)[1:200], 50)
 #' ##Get the average profile for these genes
-#'   avgProf_sense <- getAvgProfileWithCI(metaProf$Metaprofiles_Sense,
+#'   avgProf_sense <- getAvgProfileWithCI(Prof$Profiles_Sense,
 #'                                        selFeatures = randGenes,
 #'                                        pos = c(-50:0, 1:3, 0:50))
 #'   head(avgProf_sense)

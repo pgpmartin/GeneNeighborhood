@@ -43,25 +43,25 @@
 #'                                            sidedist = 50,
 #'                                            usePercent = TRUE,
 #'                                            nbins=3)
-#' ## Assemble the metagene profiles
-#'   metaProf <- assembleMetagene(Prof)
+#' ## Assemble the profiles:
+#'   Prof <- assembleProfiles(Prof)
 #' ## Get the average profile for all genes on the sense and antisense strands
-#'   avgALLsense = getAvgProfileWithCI(metaProf$Metaprofiles_Sense,
+#'   avgALLsense = getAvgProfileWithCI(Prof$Profiles_Sense,
 #'                                     pos = c(-50:0, 1:3, 0:50))
-#'   avgALLantisense = getAvgProfileWithCI(metaProf$Metaprofiles_Antisense,
+#'   avgALLantisense = getAvgProfileWithCI(Prof$Profiles_Antisense,
 #'                                         pos = c(-50:0, 1:3, 0:50))
 #' ## Select genes with a close neighbor on the same strand
 #'   selGenes <- names(Genegr)[S4Vectors::mcols(
 #'                   GenomicRanges::distanceToNearest(Genegr))$distance <= 5]
 #' ## Get their average profiles
-#'   avgSELsense = getAvgProfileWithCI(metaProf$Metaprofiles_Sense,
+#'   avgSELsense = getAvgProfileWithCI(Prof$Profiles_Sense,
 #'                                     selFeatures = selGenes,
 #'                                     pos = c(-50:0, 1:3, 0:50))
-#'   avgSELantisense = getAvgProfileWithCI(metaProf$Metaprofiles_Antisense,
+#'   avgSELantisense = getAvgProfileWithCI(Prof$Profiles_Antisense,
 #'                                         selFeatures = selGenes,
 #'                                         pos = c(-50:0, 1:3, 0:50))
 #' ## Define the xcoordinates:
-#'   Xcoord = c(seq(0, 2, length.out = 51),
+#'   xcoord = c(seq(0, 2, length.out = 51),
 #'              seq(2, 3, length.out = 5)[2:4],
 #'              seq(3, 5, length.out = 51))
 #' ## Assemble the data for plotting:
@@ -70,7 +70,7 @@
 #'   avgprof$Strand = rep(rep(c("sense", "antisense"),
 #'                            each = 105),
 #'                        times =2)
-#'   avgprof$Xcoord = rep(Xcoord, 4)
+#'   avgprof$Xcoord = rep(xcoord, 4)
 #'   avgprof$GeneSet = rep(c("All genes", "Close tandem neighbor"),
 #'                         each = 210)
 #' ## Finally plot the results:

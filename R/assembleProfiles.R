@@ -1,7 +1,7 @@
-#' @title Assemble metagene profiles from the results of the annotationCoverageAroundFeatures function
+#' @title Assemble profiles from the results of the annotationCoverageAroundFeatures function
 #'
-#' @description Assemble metagene/metafeature profiles from the results of the annotationCoverageAroundFeatures function.   \cr
-#'              A metagene profile is defined as:
+#' @description Assemble profiles from the results of the annotationCoverageAroundFeatures function.   \cr
+#'              For each gene/feature, the function creates a profile containing:
 #' \enumerate{
 #'   \item A region upstream of the feature ending with the upstream border of the feature (typically the TSS)
 #'   \item A region covering the body of the feature (possibly binned to normalize for different features' sizes)
@@ -22,8 +22,8 @@
 #'
 #' @return a list of 2 RleLists corresponding to:
 #'  \itemize{
-#'   \item \code{Metaprofiles_Sense}: RleList of metagene profiles for the sense strand
-#'   \item \code{Metaprofiles_Antisense}: RleList of metagene profiles for the antisense strand
+#'   \item \code{Profiles_Sense}: RleList of profiles for the sense strand
+#'   \item \code{Profiles_Antisense}: RleList of profiles for the antisense strand
 #'  }
 #'
 #' @export
@@ -36,10 +36,10 @@
 #'                                                 sidedist = 50,
 #'                                                 usePercent = TRUE,
 #'                                                 nbins=3)
-#' ## Assemble the metagene profiles
-#'   metaProf <- assembleMetagene(top10Prof)
+#' ## Assemble the profiles:
+#'   Prof <- assembleProfiles(top10Prof)
 
-assembleMetagene <- function(annotcovr, sideDist=NULL) {
+assembleProfiles <- function(annotcovr, sideDist=NULL) {
 
  #Test arguments
 if (!all(c(is.list(annotcovr),
@@ -80,6 +80,6 @@ if (!is.null(sideDist) && is.finite(sideDist) && sideDist < 0) {
   names(res_antisense) <- rownames(annotcovr$Feature_Antisense)
   res_antisense <- matrix2RleList(res_antisense)
 
-  return(list("Metaprofiles_Sense" = res_sense,
-              "Metaprofiles_Antisense" = res_antisense))
+  return(list("Profiles_Sense" = res_sense,
+              "Profiles_Antisense" = res_antisense))
   }
