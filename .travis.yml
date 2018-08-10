@@ -5,11 +5,9 @@ sudo: false
 cache: packages
 warnings_are_errors: true
 use_bioc: true
+bioc-release
 os:
   - linux
   - osx
 
-r:
-  - 3.4
-  - release
-  - devel
+r: bioc-release

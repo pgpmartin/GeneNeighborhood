@@ -215,7 +215,8 @@ if (is.null(glist)) {
     distsum <- dplyr::bind_rows(distsum, distsumUniv)
     distsum$GeneGroup <- factor(rep(c("GeneList", "GeneUniverse"),
                                     times=c(nr, nrow(distsumUniv))),
-                                levels=c("GeneList", "GeneUniverse"), ordered=T)
+                                levels=c("GeneList", "GeneUniverse"),
+                                ordered = TRUE)
 
     #Add statistics to the table
     distsum$KS.pvalue <- rep(NA, nrow(distsum))
@@ -449,7 +450,7 @@ analyzeNeighborsDistance <- function(GeneList,
     dplyr::mutate(Side = factor(rep(c("Upstream", "Downstream"),
                                     times=c(nrow(upres$distances), nrow(dnres$distances))),
                                 levels=c("Upstream", "Downstream"),
-                                ordered=T)) %>%
+                                ordered = TRUE)) %>%
     dplyr::rename("Neighbor" = "SideGene",
                   "Orientation" = "SideClass") %>%
     dplyr::select(.data$GeneName, .data$Neighbor, .data$Side, .data$Orientation, .data$Distance)

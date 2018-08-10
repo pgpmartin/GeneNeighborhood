@@ -220,7 +220,7 @@ up$p.value <- apply(up[,-1],1, function(x){
                                                              x["n_Universe"]-x["n"],
                                                              nUP-x["n"],
                                                              nunivUP-nUP-x["n_Universe"]+x["n"]),
-                                                           nrow=2, byrow=T)
+                                                           nrow=2, byrow = TRUE)
                                            fisher.test(tablo,
                                                        alternative="greater")$p.value
                    })
