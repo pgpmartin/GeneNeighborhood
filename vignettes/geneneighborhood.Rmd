@@ -1,10 +1,10 @@
 ---
-title: "GeneNeighborhood package"
+title: "The GeneNeighborhood package"
 author: "Pascal GP Martin"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{GeneNeighborhood package}
+  %\VignetteIndexEntry{The GeneNeighborhood package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-  The GeneNeighborhood provides statistical and graphical tools to analyze the direct neighborhood of sets of genes (called the "focus genes"). Here, "direct neighborhood" means the first upstream and downstream gene neighbors. We're interested in evaluating if these neighbors are enriched for a specific orientation/configuration and/or if their distance to the focus genes is shorter or larger than expected by chance.   
+  The GeneNeighborhood pckage provides statistical and graphical tools to analyze the direct neighborhood of sets of genes (called the "focus genes"). Here, "direct neighborhood" means the first upstream and downstream gene neighbors. We're interested in evaluating if these neighbors are enriched for a specific orientation/configuration and/or if their distance to the focus genes is shorter or larger than expected by chance.   
 
 The main questions that this package addresses are, for a given set of focus genes:  
 

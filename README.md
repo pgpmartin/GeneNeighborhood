@@ -1,4 +1,6 @@
 
+[![Travis build status](https://travis-ci.com/pgpmartin/GeneNeighborhood.svg?branch=master)](https://travis-ci.com/pgpmartin/GeneNeighborhood)
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 GeneNeighborhood
 ================
