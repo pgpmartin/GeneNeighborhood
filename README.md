@@ -1,5 +1,5 @@
 
-[![Travis build status](https://travis-ci.com/pgpmartin/GeneNeighborhood.svg?branch=master)](https://travis-ci.com/pgpmartin/GeneNeighborhood)
+[![Travis build status](https://travis-ci.com/pgpmartin/GeneNeighborhood.svg?branch=master)](https://travis-ci.com/pgpmartin/GeneNeighborhood) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/pgpmartin/GeneNeighborhood?branch=master&svg=true)](https://ci.appveyor.com/project/pgpmartin/GeneNeighborhood)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 GeneNeighborhood
