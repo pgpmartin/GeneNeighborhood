@@ -1,0 +1,137 @@
+---
+title: "GeneNeighborhood package"
+author: "Pascal GP Martin"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GeneNeighborhood package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+  The GeneNeighborhood provides statistical and graphical tools to analyze the direct neighborhood of sets of genes (called the "focus genes"). Here, "direct neighborhood" means the first upstream and downstream gene neighbors. We're interested in evaluating if these neighbors are enriched for a specific orientation/configuration and/or if their distance to the focus genes is shorter or larger than expected by chance.   
+
+The main questions that this package addresses are, for a given set of focus genes:  
+
+* Are the upstream or downstream neighbors in a specific orientation? Do they tend to overlap the focus genes more than expected?  
+
+* For non overlapping upstream or downstream neighbors, do they tend to be closer or farther from the focus genes than expected?  
+
+* More generally, do annotations located in the vicinity of the focus genes reveal any pattern compared to other sets of genes?  
+
+
+## Let's start
+
+### Load libraries
+Load the library:
+```{r load libraries}
+library(GeneNeighborhood)
+```
+   
+Throughout this vignette, we will also use other packages:
+```{r, message=FALSE, warning=FALSE}
+library(GenomeInfoDb)
+```
+
+
+```{r load hidden libs, include = FALSE}
+library(knitr)
+library(dplyr)
+library(reshape2)
+library(GenomicRanges)
+```
+   
+   
+### Get some data
+
+The GeneNeighborhood package provides a toy dataset named `Genegr` that is used in the README file on [Github](https://github.com/pgpmartin/GeneNeighborhood) and throughout the examples in the documentation of the functions.   
+
+For a more realistic example, we will work on the Arabidopsis thaliana gene annotations. These are available as a package in Bioconducor:
+```{r, message=FALSE, warning=FALSE}
+library(TxDb.Athaliana.BioMart.plantsmart25)
+```
+If you can't find a Txdb package for your organism in [Bioconductor](http://bioconductor.org/packages/release/BiocViews.html#___TxDb) or [AnnotationHub](http://bioconductor.org/packages/release/bioc/html/AnnotationHub.html), it is relatively easy to create your own package, using for example the [GenomicFeatures](http://bioconductor.org/packages/release/bioc/html/GenomicFeatures.html) or the [ensembldb](http://bioconductor.org/packages/release/bioc/html/ensembldb.html) package. 
+   
+   
+We get the gene annotations from the TxDb package using:
+```{r}
+gn <- genes(TxDb.Athaliana.BioMart.plantsmart25)
+```
+   
+In order to limit the computation time but still work on a realistic example we keep the first 2 chromosomes:
+```{r}
+gn <- keepSeqlevels(gn, 1:2, pruning.mode = "coarse")
+```
+   This represents `r length(gn)` genes.
+   
+## Obtain information on the upstream/downstream genes
+
+ The first step in our analysis consists in extracting from the `GRanges` object the information about the neighbors. While this might seem trivial (such as just using correctly the `precede` and `follow` functions from the [GenomicRanges](http://bioconductor.org/packages/release/bioc/html/GenomicRanges.html)), there is actually a variety of cases that can be encountered throughout the genome that makes things quickly complicated.  
+ For now, the `GeneNeighborhood` package only analyzes genes that either don't overlap with any other genes (the easy case) or that overlap with only one other gene, as illustrated here:   
+   
+ ![](Fig_getGeneNeighborhood.png)
+   
+   
+For each feature/gene, we extract information (orientation and distance, potential overlaps) about their upstream/downstream neighbors with:
+```{r extract GeneNeighbors}
+GeneNeighbors <- getGeneNeighborhood(gn)
+```
+  
+
+## Analyze the orientation of the genes' neighbors
+  
+We define a random set of 300 genes:
+```{r define random genes}
+set.seed(123)
+randGenes <- sample(names(gn), 300)
+```
+  
+  
+We extract statistics about the orientation of their neighbors using:
+```{r NOS random genes, results = "hide"}
+## Neighbors Orientation Statistics:
+NOS <- analyzeNeighborsOrientation(randGenes, 
+                                   GeneNeighborhood = GeneNeighbors)
+```
+  
+  
+By default all genes are used as a universe and an enrichment test is performed.   
+By default, the function also analyzes the *"other"* orientation which may be hard to interpret. We can remove this orientation using:
+```{r NOS without other}
+NOS <- analyzeNeighborsOrientation(randGenes, 
+                                   GeneNeighborhood = GeneNeighbors,
+                                   keepOther = FALSE)
+```
+  
+  
+We obtain the following table:
+```{r NOS kable, echo = FALSE}
+NOS  %>% 
+  dplyr::mutate(p.value = signif(p.value, 2)) %>%
+  knitr::kable(digits = c(1,1,1,2,1,2,300), 
+               format = "markdown",
+               caption="100 random genes")
+```
+  
+  
+We can plot the corresponding percentages using:
+```{r plotOrientationNOS, fig.height = 5, fig.width = 5}
+plotNeighborsOrientation(NOS)
+```
+
+
+## Analyze the proximity of the genes' neighbors
+
+We can analyze specifically the distances to the upstream genes with:
+```{r randUpstreamDist, results = "hide"}
+randUpstreamDist <- statDistanceSide(GeneNeighborhood = GeneNeighbors,
+                                     glist = randGenes,
+                                     Side = "Upstream")
+```

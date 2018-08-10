@@ -234,7 +234,7 @@ RleList2matrix <- function(rlelist = NULL)
     stop("The elements of rlelist should all have the same length")
   }
 ##Convert to matrix
-  matrix(as.numeric(unlist(rlelist, use.names=F)),
+  matrix(as.numeric(unlist(rlelist, use.names = FALSE)),
          nrow = length(rlelist),
          byrow = TRUE,
          dimnames = list(names(rlelist),

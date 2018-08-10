@@ -316,7 +316,7 @@ dn$p.value <- apply(dn[,-1],1, function(x){
                                                              x["n_Universe"]-x["n"],
                                                              nDN-x["n"],
                                                              nunivDN-nDN-x["n_Universe"]+x["n"]),
-                                                           nrow=2, byrow=T)
+                                                           nrow=2, byrow = TRUE)
                                            fisher.test(tablo,
                                                        alternative="greater")$p.value
                    })

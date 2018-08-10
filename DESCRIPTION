@@ -30,8 +30,10 @@ Imports:
     tibble,
     utils
 Suggests: 
- knitr,
- TxDb.Athaliana.BioMart.plantsmart25
+    knitr,
+    TxDb.Athaliana.BioMart.plantsmart25,
+    rmarkdown
 RoxygenNote: 6.1.0
 URL: https://github.com/pgpmartin/GeneNeighborhood
 BugReports: https://github.com/pgpmartin/GeneNeighborhood/issues
+VignetteBuilder: knitr

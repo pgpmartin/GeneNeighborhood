@@ -243,7 +243,7 @@ if (is.null(glist)) {
       suppressWarnings(
         distsum$KS.pvalue[i] <- ks.test(testSet %>% dplyr::pull(.data$Distance),
                                         univSet[isInTestSet=="Universe",] %>% dplyr::pull(.data$Distance),
-                                        exact=F)$p.value
+                                        exact = FALSE)$p.value
       )
 
       ##Mann-Whitney U test
@@ -457,9 +457,9 @@ analyzeNeighborsDistance <- function(GeneList,
   #statistics
   res$stats <- dplyr::bind_rows(upres$stats, dnres$stats) %>%
     dplyr::mutate(Side = factor(rep(c("Upstream", "Downstream"),
-                                    times=c(nrow(upres$stats), nrow(dnres$stats))),
-                                levels=c("Upstream", "Downstream"),
-                                ordered=T)) %>%
+                                    times = c(nrow(upres$stats), nrow(dnres$stats))),
+                                levels = c("Upstream", "Downstream"),
+                                ordered = TRUE)) %>%
     dplyr::rename("Orientation" = "SideClass")
 
   if (DistriTest) {
