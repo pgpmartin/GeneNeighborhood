@@ -4,12 +4,16 @@ language: r
 sudo: false
 cache: packages
 
-r: bioc-release
-#use_bioc: true
+r:
+  - bioc-release
+  - bioc-devel
 
 bioc_packages:
   - GenomeInfoDbData
   - TxDb.Athaliana.BioMart.plantsmart25
+
+r_packages:
+  - covr
 
 # Strict checks
 warnings_are_errors: true
@@ -18,3 +22,5 @@ os:
   - linux
   - osx
 
+after_success:
+  - Rscript -e 'covr::codecov(test = "all")'
