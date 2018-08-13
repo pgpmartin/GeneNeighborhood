@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-  The GeneNeighborhood pckage provides statistical and graphical tools to analyze the direct neighborhood of sets of genes (called the "focus genes"). Here, "direct neighborhood" means the first upstream and downstream gene neighbors. We're interested in evaluating if these neighbors are enriched for a specific orientation/configuration and/or if their distance to the focus genes is shorter or larger than expected by chance.   
+  The GeneNeighborhood package provides statistical and graphical tools to analyze the direct neighborhood of sets of genes (called the "focus genes"). Here, "direct neighborhood" means the first upstream and downstream gene neighbors. We're interested in evaluating if these neighbors are enriched for a specific orientation/configuration and/or if their distance to the focus genes is shorter or larger than expected by chance.   
 
 The main questions that this package addresses are, for a given set of focus genes:  
 
@@ -87,15 +87,15 @@ GeneNeighbors <- getGeneNeighborhood(gn)
 
 ## Analyze the orientation of the genes' neighbors
   
-We define a random set of 300 genes:
+We define a random set of 400 genes:
 ```{r define random genes}
-set.seed(123)
-randGenes <- sample(names(gn), 300)
+set.seed(123) # for reproducibility
+randGenes <- sample(names(gn), 400)
 ```
   
   
 We extract statistics about the orientation of their neighbors using:
-```{r NOS random genes, results = "hide"}
+```{r NOS random genes, eval=FALSE}
 ## Neighbors Orientation Statistics:
 NOS <- analyzeNeighborsOrientation(randGenes, 
                                    GeneNeighborhood = GeneNeighbors)
@@ -125,13 +125,117 @@ We can plot the corresponding percentages using:
 ```{r plotOrientationNOS, fig.height = 5, fig.width = 5}
 plotNeighborsOrientation(NOS)
 ```
-
+  
+  The analysis of neighbor genes'orientations allows to detect an enrichment for a specific orientation (*"SameStrand"* or *"OppositeStrand"*) in the absence of overlap, as well as the situations where the upstream or downstream gene overlaps with the focus genes (*"SameOverlap"*" or *"OppositeOverlap"*" orientations).   
+  Even in the absence of enrichment for a specific situation, it might be relevant to evaluate if the gene neighbors are located at a specific distance from the focus genes, i.e. closer or farther than expected.  
+  
+  
 
 ## Analyze the proximity of the genes' neighbors
-
-We can analyze specifically the distances to the upstream genes with:
+  
+### Analysis of a random set of genes:  
+  
+Analyzing the distances of the upstream **or** downstream genes can be done with:
 ```{r randUpstreamDist, results = "hide"}
 randUpstreamDist <- statDistanceSide(GeneNeighborhood = GeneNeighbors,
                                      glist = randGenes,
                                      Side = "Upstream")
+```
+  
+Which gives the following (simplified) table:
+```{r randUpstreamDist kable, echo = FALSE}
+randUpstreamDist$stats  %>% 
+  dplyr::select(GeneGroup, SideClass, n, Median, Mean, SD, KS.pvalue:Independ.pvalue) %>%
+  dplyr::mutate(KS.pvalue = signif(KS.pvalue, 2),
+                Wilcox.pvalue = signif(Wilcox.pvalue, 2),
+                Independ.pvalue = signif(Independ.pvalue, 2)) %>%
+  knitr::kable(digits = c(1,1,1,2,2,2,300,300,300), 
+               format = "markdown",
+               caption="Upstream distances of random genes")
+```
+  
+  
+  However, the analysis of **both** upstream and downstream genes with the `statDistanceSide` function is wrapped in the `analyzeNeighborsDistance` function: 
+```{r randDist, results = "hide"}
+randDist <- analyzeNeighborsDistance(GeneList = randGenes,
+                                     GeneNeighborhood = GeneNeighbors)
+```
+
+We obtain the following (simplified) table:
+```{r randDist kable, echo = FALSE}
+randDist$stats  %>% 
+  dplyr::select(GeneGroup:n, Median, Mean, SD, KS.pvalue:Independ.pvalue) %>%
+  dplyr::mutate(KS.pvalue = signif(KS.pvalue, 2),
+                Wilcox.pvalue = signif(Wilcox.pvalue, 2),
+                Independ.pvalue = signif(Independ.pvalue, 2)) %>%
+  knitr::kable(digits = c(1,1,1,1,2,2,2,300,300,300), 
+               format = "markdown",
+               caption="Upstream distances")
+```
+   
+   
+### Extracting intergenic distances:  
+
+The `analyzeNeighborsDistance` function can also be used to extract intergenic distances for all genes (overlapping upstream or downstream genes are removed automatically here). To do this, we only set the `GeneList` argument to be all genes and set `DistriTest=FALSE`:
+```{r alldist, results = "hide"}
+alldist <- analyzeNeighborsDistance(GeneList = names(gn),
+                                    GeneNeighborhood = GeneNeighbors,
+                                    DistriTest = FALSE)
+```
+  
+  
+### Analyze a set of genes enriched for close upstream neighbors:
+  To illustrate how a specific proximity pattern can be detected and represented, we use these intergenic distances to select a set of genes with more frequent short upstream distances than expected by chance, whatever the orientation (same or opposite strand).   
+  
+  First, we extract upstream distances:
+```{r updist}
+updist <- alldist$distances$Distance[alldist$distances$Side=="Upstream"]
+names(updist) <- alldist$distances$GeneName[alldist$distances$Side=="Upstream"]
+```
+  Then we define a probability of selecting the gene that is inversely proportional to its upstream distance:
+```{r probs}
+updistQ <- pmin(updist, quantile(updist,0.99)) #We replace extreme values by the 99th percentile
+probs <- (max(updistQ) - updistQ) / 
+         sum(max(updistQ) - updistQ)
+```
+  Then we select 800 genes using these probabilities:
+```{r lessRandGenes}
+set.seed(123)
+closeUpstreamNeighbors <- sample(names(updist), 800, prob=probs)
+```
+  And finally we analyze the intergenic distances with these genes' neighbors:
+```{r lessRandDist, results = "hide"}
+closeUpstreamDist <- analyzeNeighborsDistance(GeneList = closeUpstreamNeighbors,
+                                              GeneNeighborhood = GeneNeighbors)
+```
+   
+We obtain the following (simplified) table:
+```{r lessRandDist kable, echo = FALSE}
+closeUpstreamDist$stats  %>% 
+  dplyr::select(GeneGroup:n, Median, Mean, SD, KS.pvalue:Independ.pvalue) %>%
+  dplyr::mutate(KS.pvalue = signif(KS.pvalue, 2),
+                Wilcox.pvalue = signif(Wilcox.pvalue, 2),
+                Independ.pvalue = signif(Independ.pvalue, 2)) %>%
+  knitr::kable(digits = c(1,1,1,1,2,2,2,300,300,300), 
+               format = "markdown",
+               caption="Upstream distances of close upstream neighbors")
+```
+   
+   
+### Plotting the results:
+Before plotting, we need to assemble the distances for different groups of genes in a single data frame:
+```{r mydist dataset}
+mydist <- rbind.data.frame(alldist$distances,
+                           randDist$distances,
+                           closeUpstreamDist$distances)
+mydist$GeneSet <- rep(c("All Genes", "Random Genes", "Close Upstream"),
+                      times = c(nrow(alldist$distances), 
+                                nrow(randDist$distances), 
+                                nrow(closeUpstreamDist$distances)))
+```
+   
+   
+Now, we can plot the distribution of intergenic distances for these sets of genes:
+```{r plotDistanceDensities, message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7}
+plotDistanceDensities(mydist)
 ```
