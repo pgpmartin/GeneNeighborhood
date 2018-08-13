@@ -23,4 +23,4 @@ os:
   - osx
 
 after_success:
-  - Rscript -e 'covr::codecov(test = "all")'
+  - Rscript -e 'covr::codecov(type = "all")'
