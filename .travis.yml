@@ -1,12 +1,20 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: R
+language: r
 sudo: false
 cache: packages
+
+r: bioc-release
+#use_bioc: true
+
+bioc_packages:
+  - GenomeInfoDbData
+  - TxDb.Athaliana.BioMart.plantsmart25
+
+# Strict checks
 warnings_are_errors: true
-use_bioc: true
+
 os:
   - linux
   - osx
 
-r: bioc-release

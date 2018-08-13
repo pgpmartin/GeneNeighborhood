@@ -11,12 +11,14 @@ install:
   ps: Bootstrap
 
 cache:
-  - C:\RLibrary
+  #- C:\RLibrary
 
 # Adapt as necessary starting from here
-
 build_script:
+  - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_deps
+  - travis-tool.sh install_bioc GenomeInfoDbData
+#  - travis-tool.sh install_bioc TxDb.Athaliana.BioMart.plantsmart25
 
 test_script:
   - travis-tool.sh run_tests
@@ -43,3 +45,14 @@ artifacts:
 
   - path: '\*_*.zip'
     name: Bits
+
+environment:
+  global:
+    WARNINGS_ARE_ERRORS: true
+    _R_CHECK_FORCE_SUGGESTS_: false # don't check suggested packges
+    R_COMPILE_AND_INSTALL_PACKAGES: always
+    R_ARCH: x64
+    USE_RTOOLS: true ## to be able to use Remotes (i.e. packages from non-CRAN sources)
+
+  matrix:
+    - R_VERSION: release
