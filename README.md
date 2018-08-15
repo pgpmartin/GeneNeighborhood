@@ -464,10 +464,10 @@ mydist$GeneSet <- rep(c("All Genes", "Random Genes", "Less Random genes"),
 Now, we can plot the distribution of intergenic distances for these sets of genes:
 
 ``` r
-plotDistanceDensities(mydist)
+plotDistanceDistrib(mydist)
 ```
 
-<img src="man/figures/README-plotDistanceDensities-1.png" width="100%" />
+<img src="man/figures/README-plotDistanceDistrib-1.png" width="100%" />
 
 ### Metagene profiles
 
