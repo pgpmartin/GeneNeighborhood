@@ -22,5 +22,8 @@ os:
   - linux
   - osx
 
+#Fix this issue: https://github.com/travis-ci/travis-ci/issues/10295
+fortran: false
+
 after_success:
   - Rscript -e 'covr::codecov(type = "all")'
