@@ -22,18 +22,18 @@ The goal of GeneNeighborhood is to extract and analyze the orientation and proxi
 
 ## Installation
 
-(NOT THERE YET!) You can install the released version of GeneNeighborhood from [CRAN](https://CRAN.R-project.org) with:
-
-``` r
+``` {r, eval=FALSE, echo=FALSE}
+#You can install the released version of GeneNeighborhood from [CRAN](https://CRAN.R-project.org) with:
 install.packages("GeneNeighborhood")
 ```
 
-And the development version from [GitHub](https://github.com/) with:
+The development version of the GeneNeighborhood package can be installed from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("pgpmartin/GeneNeighborhood")
 ```
+  
 ## Example
 
 Load the library:
@@ -107,11 +107,12 @@ plotNeighborsOrientation(NOS)
 
 ### Analyze the proximity of the genes' neighbors
 
-We can analyze specifically the distances to the upstream genes with:
-```{r randUpstreamDist, results = "hide"}
+We can analyze specifically the distances to the upstream genes with (here using 1000 bootstrap replicates to estimate the 95% confidence intervals of the mean and median):
+```{r randUpstreamDist, results = "hide", warning=FALSE}
 randUpstreamDist <- statDistanceSide(GeneNeighborhood = GeneNeighbors,
                                      glist = randGenes,
-                                     Side = "Upstream")
+                                     Side = "Upstream",
+                                     nboot = 1e3)
 ```
 
 Which gives the following (simplified) table:
@@ -128,9 +129,10 @@ randUpstreamDist$stats  %>%
   
   
 Or we directly analyze the distances to both upstream and downstream genes:
-```{r randDist, results = "hide"}
+```{r randDist, results = "hide", warning=FALSE}
 randDist <- analyzeNeighborsDistance(GeneList = randGenes,
-                                     GeneNeighborhood = GeneNeighbors)
+                                     GeneNeighborhood = GeneNeighbors,
+                                     nboot = 1e3)
 ```
 
 Which gives the following (simplified) table:
@@ -145,14 +147,27 @@ randDist$stats  %>%
                caption="Upstream distances")
 ```
    
+
+The `alldist$stats` table also contains 95% bootstrap confidence intervals for the mean and median of the `GeneList` set:
+```{r randDist CI values kable, echo = FALSE}
+randDist$stats  %>% 
+    dplyr::filter(GeneGroup == "GeneList") %>%
+    dplyr::select(GeneGroup:n, 
+                  Median_lowerCI, Median, Median_upperCI, 
+                  Mean_lowerCI, Mean, Mean_upperCI) %>%
+  knitr::kable(digits = c(rep(1,4), rep(2,6)), 
+               format = "markdown",
+               caption="Bootstrap CI")
+```
+
    
-The function can also be used to extract intergenic distances for all genes (except those with overlapping genes):
-```{r alldist, results = "hide"}
+The `analyzeNeighborsDistance` function can also be used to extract intergenic distances for all genes (except those with overlapping genes):
+```{r alldist, results = "hide", warning=FALSE}
 alldist <- analyzeNeighborsDistance(GeneList = names(Genegr),
                                     GeneNeighborhood = GeneNeighbors,
-                                    DistriTest = FALSE)
+                                    DistriTest = FALSE,
+                                    nboot = 1e3)
 ```
-   
    
    
 We can use these distances to preferentially select genes with a short upstream distance.   

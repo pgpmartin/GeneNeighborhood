@@ -10,13 +10,7 @@ The goal of GeneNeighborhood is to extract and analyze the orientation and proxi
 Installation
 ------------
 
-(NOT THERE YET!) You can install the released version of GeneNeighborhood from [CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("GeneNeighborhood")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+The development version of the GeneNeighborhood package can be installed from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -131,12 +125,13 @@ plotNeighborsOrientation(NOS)
 
 ### Analyze the proximity of the genes' neighbors
 
-We can analyze specifically the distances to the upstream genes with:
+We can analyze specifically the distances to the upstream genes with (here using 1000 bootstrap replicates to estimate the 95% confidence intervals of the mean and median):
 
 ``` r
 randUpstreamDist <- statDistanceSide(GeneNeighborhood = GeneNeighbors,
                                      glist = randGenes,
-                                     Side = "Upstream")
+                                     Side = "Upstream",
+                                     nboot = 1e3)
 ```
 
 Which gives the following (simplified) table:
@@ -152,7 +147,8 @@ Or we directly analyze the distances to both upstream and downstream genes:
 
 ``` r
 randDist <- analyzeNeighborsDistance(GeneList = randGenes,
-                                     GeneNeighborhood = GeneNeighbors)
+                                     GeneNeighborhood = GeneNeighbors,
+                                     nboot = 1e3)
 ```
 
 Which gives the following (simplified) table:
@@ -236,18 +232,6 @@ Which gives the following (simplified) table:
 <tr class="odd">
 <td align="left">GeneList</td>
 <td align="left">Downstream</td>
-<td align="left">OppositeStrand</td>
-<td align="right">40</td>
-<td align="right">7.0</td>
-<td align="right">15.20</td>
-<td align="right">18.69</td>
-<td align="right">0.62</td>
-<td align="right">0.50</td>
-<td align="right">0.810</td>
-</tr>
-<tr class="even">
-<td align="left">GeneList</td>
-<td align="left">Downstream</td>
 <td align="left">SameStrand</td>
 <td align="right">30</td>
 <td align="right">15.5</td>
@@ -256,6 +240,18 @@ Which gives the following (simplified) table:
 <td align="right">0.29</td>
 <td align="right">0.10</td>
 <td align="right">0.098</td>
+</tr>
+<tr class="even">
+<td align="left">GeneList</td>
+<td align="left">Downstream</td>
+<td align="left">OppositeStrand</td>
+<td align="right">40</td>
+<td align="right">7.0</td>
+<td align="right">15.20</td>
+<td align="right">18.69</td>
+<td align="right">0.62</td>
+<td align="right">0.50</td>
+<td align="right">0.810</td>
 </tr>
 <tr class="odd">
 <td align="left">GeneUniverse</td>
@@ -284,12 +280,94 @@ Which gives the following (simplified) table:
 </tbody>
 </table>
 
-The function can also be used to extract intergenic distances for all genes (except those with overlapping genes):
+The `alldist$stats` table also contains 95% bootstrap confidence intervals for the mean and median of the `GeneList` set:
+
+<table>
+<colgroup>
+<col width="9%" />
+<col width="10%" />
+<col width="13%" />
+<col width="3%" />
+<col width="13%" />
+<col width="6%" />
+<col width="13%" />
+<col width="11%" />
+<col width="5%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">GeneGroup</th>
+<th align="left">Side</th>
+<th align="left">Orientation</th>
+<th align="right">n</th>
+<th align="right">Median_lowerCI</th>
+<th align="right">Median</th>
+<th align="right">Median_upperCI</th>
+<th align="right">Mean_lowerCI</th>
+<th align="right">Mean</th>
+<th align="right">Mean_upperCI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">GeneList</td>
+<td align="left">Upstream</td>
+<td align="left">OppositeStrand</td>
+<td align="right">38</td>
+<td align="right">7.0</td>
+<td align="right">9.5</td>
+<td align="right">14.5</td>
+<td align="right">11.00</td>
+<td align="right">14.47</td>
+<td align="right">20.09</td>
+</tr>
+<tr class="even">
+<td align="left">GeneList</td>
+<td align="left">Upstream</td>
+<td align="left">SameStrand</td>
+<td align="right">33</td>
+<td align="right">5.0</td>
+<td align="right">10.0</td>
+<td align="right">10.0</td>
+<td align="right">10.21</td>
+<td align="right">13.00</td>
+<td align="right">16.91</td>
+</tr>
+<tr class="odd">
+<td align="left">GeneList</td>
+<td align="left">Downstream</td>
+<td align="left">SameStrand</td>
+<td align="right">30</td>
+<td align="right">8.5</td>
+<td align="right">15.5</td>
+<td align="right">22.5</td>
+<td align="right">14.19</td>
+<td align="right">18.70</td>
+<td align="right">25.32</td>
+</tr>
+<tr class="even">
+<td align="left">GeneList</td>
+<td align="left">Downstream</td>
+<td align="left">OppositeStrand</td>
+<td align="right">40</td>
+<td align="right">4.0</td>
+<td align="right">7.0</td>
+<td align="right">16.0</td>
+<td align="right">9.94</td>
+<td align="right">15.20</td>
+<td align="right">22.12</td>
+</tr>
+</tbody>
+</table>
+
+The `analyzeNeighborsDistance` function can also be used to extract intergenic distances for all genes (except those with overlapping genes):
 
 ``` r
 alldist <- analyzeNeighborsDistance(GeneList = names(Genegr),
                                     GeneNeighborhood = GeneNeighbors,
-                                    DistriTest = FALSE)
+                                    DistriTest = FALSE,
+                                    nboot = 1e3)
 ```
 
 We can use these distances to preferentially select genes with a short upstream distance.
@@ -318,6 +396,8 @@ And finally analyze the intergenic distances with these genes' neighbors:
 ``` r
 lessRandDist <- analyzeNeighborsDistance(GeneList = lessRandGenes,
                                          GeneNeighborhood = GeneNeighbors)
+#> Warning in norm.inter(t, adj.alpha): extreme order statistics used as
+#> endpoints
 ```
 
 We obtain the following (simplified) table:
@@ -353,18 +433,6 @@ We obtain the following (simplified) table:
 <tr class="odd">
 <td align="left">GeneList</td>
 <td align="left">Upstream</td>
-<td align="left">OppositeStrand</td>
-<td align="right">50</td>
-<td align="right">9.0</td>
-<td align="right">9.92</td>
-<td align="right">9.12</td>
-<td align="right">0.26000</td>
-<td align="right">4.8e-02</td>
-<td align="right">0.03100</td>
-</tr>
-<tr class="even">
-<td align="left">GeneList</td>
-<td align="left">Upstream</td>
 <td align="left">SameStrand</td>
 <td align="right">50</td>
 <td align="right">5.0</td>
@@ -373,6 +441,18 @@ We obtain the following (simplified) table:
 <td align="right">0.00038</td>
 <td align="right">8.9e-05</td>
 <td align="right">0.00051</td>
+</tr>
+<tr class="even">
+<td align="left">GeneList</td>
+<td align="left">Upstream</td>
+<td align="left">OppositeStrand</td>
+<td align="right">50</td>
+<td align="right">9.0</td>
+<td align="right">9.92</td>
+<td align="right">9.12</td>
+<td align="right">0.26000</td>
+<td align="right">4.8e-02</td>
+<td align="right">0.03100</td>
 </tr>
 <tr class="odd">
 <td align="left">GeneUniverse</td>

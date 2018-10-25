@@ -1,9 +1,13 @@
 #' @title Extract windows of interest from a coverage.
 #'
-#' @description Extract profiles from a genome-wide coverage on a set of windows of interest. Reverses the profiles for windows that are on the '-' (minus) strand.
+#' @description Extract profiles from a genome-wide coverage on a set
+#'     of windows of interest. Reverses the profiles for windows that
+#'     are on the '-' (minus) strand.
 #'
-#' @param covr RleList. A genome-wide coverage (typically obtained with the \code{\link[GenomicRanges]{coverage}} function).
-#' @param woi A \code{\link{GRanges}}. Windows of interest, over which to extract the profiles.
+#' @param covr RleList. A genome-wide coverage (typically obtained with
+#'             the \code{\link[GenomicRanges]{coverage}} function).
+#' @param woi A \code{\link{GRanges}}. Windows of interest,
+#'             over which to extract the profiles.
 #'
 #' @importFrom GenomicRanges strand
 #' @importFrom S4Vectors revElements
@@ -13,7 +17,7 @@
 #'
 #' @return An RleList with stranded profiles at woi
 #'
-#' @section DETAILS:
+#' @details
 #' Note that names of covr and seqnames of gr must match
 #'
 #' @examples
@@ -33,45 +37,50 @@
 profcomp <- function(covr=NULL, woi=NULL) {
 
 ## Check objects class
-  if (any(c(is.null(covr), is.null(woi)))) {
-    stop("Both covr and woi arguments should be provided to the profcomp function")
-  }
-  if (!is(covr, "RleList")) {
+if (any(c(is.null(covr), is.null(woi)))) {
+    stop("Both covr and woi arguments should be provided
+         to the profcomp function")
+}
+
+if (!is(covr, "RleList")) {
     stop("covr should be an RleList")
-  }
-  if (!is(woi, "GRanges")) {
+}
+
+if (!is(woi, "GRanges")) {
     stop("woi should be a GRanges")
-  }
+}
 
 ## Check that seqlevels(gr) and names(covr) match
-  if (is.null(names(covr)) & length(covr)>1) {
+if (is.null(names(covr)) & length(covr)>1) {
     message()
-  }
-  if (length(intersect(GenomeInfoDb::seqlevels(woi),
-                       names(covr))) == 0) {
+}
+
+if (length(intersect(GenomeInfoDb::seqlevels(woi),
+                     names(covr))) == 0) {
     stop("Names of covr and seqlevels of woi don't match")
-  }
+}
 
 ## Check for undefined strand
-  isStar <- as.logical(GenomicRanges::strand(woi)=="*")
-  if (any(isStar)) {
+isStar <- as.logical(GenomicRanges::strand(woi)=="*")
+
+if (any(isStar)) {
     message("'*' ranges were treated as '+' ranges")
-  }
+}
 
 ## Extract the profiles
-  prof = covr[woi]
+prof = covr[woi]
 
 ## Reverse the profiles for features on the minus strand
-  prof <- revElements(prof, as.logical(GenomicRanges::strand(woi)=='-'))
+prof <- revElements(prof, as.logical(GenomicRanges::strand(woi)=='-'))
 
 ## Add names to the profiles:
-  if (is.null(names(woi))) {
+if (is.null(names(woi))) {
     message("woi has no names to propagate to the extracted profiles")
-  } else {
+} else {
     names(prof)=names(woi)
-  }
+}
 
-  return(prof)
+return(prof)
 }
 
 
@@ -86,8 +95,9 @@ profcomp <- function(covr=NULL, woi=NULL) {
 #'
 #' @return A GRanges of the TES positions
 #'
-#' @section DETAILS:
-#' The TES is defined as start(gr) when strand(gr)=="+" and as end(gr) when strand(gr)=="-"
+#' @details
+#' The TES is defined as start(gr) when strand(gr)=="+" and
+#' as end(gr) when strand(gr)=="-"
 #' The function considers that strand=="*" is equivalent to strand=="+"
 #'
 #' @examples
@@ -101,33 +111,42 @@ profcomp <- function(covr=NULL, woi=NULL) {
 getTES <- function(gr) {
 
 ## Check for undefined strand
-  isStar <- as.logical(GenomicRanges::strand(gr)=="*")
-  if (any(isStar)) {
+isStar <- as.logical(GenomicRanges::strand(gr)=="*")
+
+if (any(isStar)) {
     message("'*' ranges were treated as '+' ranges")
-  }
+}
 
 ## Reverse gr strand
-  revgr <- gr
-  GenomicRanges::strand(revgr) <- ifelse(as.logical(GenomicRanges::strand(gr)=="-"), "+", "-")
+revgr <- gr
+GenomicRanges::strand(revgr) <- ifelse(
+                                    as.logical(GenomicRanges::strand(gr)=="-"),
+                                    "+",
+                                    "-")
 
 ## Get TES coordinates
-  tes <- GenomicRanges::promoters(revgr, upstream=0, downstream=1)
+tes <- GenomicRanges::promoters(revgr, upstream=0, downstream=1)
 
 ## Reverse back the strand
-  GenomicRanges::strand(tes) <- GenomicRanges::strand(gr)
+GenomicRanges::strand(tes) <- GenomicRanges::strand(gr)
 
-  return(tes)
+return(tes)
 }
 
 
 
-#' Extract a region around the TES (=end of the gene) from a \code{\link{GRanges}}
+#' Extract a region around the TES (=end of the gene) from
+#'     a \code{\link{GRanges}}
 #'
 #' @param gr A \code{\link{GRanges}}.
-#' @param upstream An integer defining the distance upstream of the TES to extract.
-#' @param downstream An integer defining the distance downstream of the TES to extract.
-#' @param limitToTSS A logical (default to FALSE) indicating if ranges should be trimmed to don't extend upstream of the TSS
-#' @param trim A logical (default to FALSE) indicating if out-of-bound ranges should be trimmed (see ?`trim,GenomicRanges-method`)
+#' @param upstream An integer defining the distance upstream of the
+#'                 TES to extract.
+#' @param downstream An integer defining the distance downstream of
+#'                   the TES to extract.
+#' @param limitToTSS A logical (default to FALSE) indicating if ranges should
+#'                   be trimmed to don't extend upstream of the TSS
+#' @param trim A logical (default to FALSE) indicating if out-of-bound ranges
+#'             should be trimmed (see ?`trim,GenomicRanges-method`)
 #'
 #' @importFrom GenomicRanges strand promoters trim start end
 #'
@@ -135,73 +154,102 @@ getTES <- function(gr) {
 #'
 #' @return A GRanges of regions around the TES positions.
 #'
-#' @section DETAILS:
-#' The TES is defined as start(gr) when strand(gr)=="+" and as end(gr) when strand(gr)=="-"
+#' @details
+#' The TES is defined as start(gr) when strand(gr)=="+" and
+#' as end(gr) when strand(gr)=="-"
 #' The function considers that strand=="*" is equivalent to strand=="+"
-#' To extract 500bp on each side of the TES, use \code{upstream=500} and \code{downstream=501}
+#' To extract 500bp on each side of the TES,
+#' use \code{upstream=500} and \code{downstream=501}
 #'
-#'@seealso promoters flank ?`trim,GenomicRanges-method`
+#'@seealso \code{\link[GenomicRanges:intra-range-methods]{promoters}},
+#'         \code{\link[GenomicRanges:intra-range-methods]{flank}} and
+#'         \code{\link[GenomicRanges:intra-range-methods]{trim}}
+#'         in \code{\link[GenomicRanges:intra-range-methods]{intra-range-methods}}
 #'
 #' @examples
 #' ## Get a 50bp region on each side of the TSS of genes in GeneGR:
-#'   suppressWarnings(GenomicRanges::promoters(Genegr, upstream = 50, downstream = 51))
+#'   suppressWarnings(
+#'    GenomicRanges::promoters(Genegr,
+#'                               upstream = 50,
+#'                               downstream = 51)
+#'                   )
 #' ## Same around the TES:
-#'   suppressWarnings(getTESregion(Genegr, upstream = 50, downstream = 51))
+#'   suppressWarnings(
+#'     getTESregion(Genegr, upstream = 50, downstream = 51)
+#'     )
 #' ## Do not extend regions beyond the TSS or Chr1 borders
-#'   getTESregion(Genegr, upstream = 50, downstream = 51, limitToTSS = TRUE, trim = TRUE)
+#'   getTESregion(Genegr,
+#'                upstream = 50,
+#'                downstream = 51,
+#'                limitToTSS = TRUE,
+#'                trim = TRUE)
 #'
 #' @author Pascal GP Martin
 
-getTESregion <- function(gr, upstream=500L, downstream=501L, limitToTSS = FALSE, trim = FALSE) {
-  ## Check for undefined strand
-  isStar <- as.logical(GenomicRanges::strand(gr)=="*")
-  if (any(isStar)) {
+getTESregion <- function(gr,
+                         upstream=500L,
+                         downstream=501L,
+                         limitToTSS = FALSE,
+                         trim = FALSE) {
+
+## Check for undefined strand
+isStar <- as.logical(GenomicRanges::strand(gr)=="*")
+if (any(isStar)) {
     message("'*' ranges were treated as '+' ranges")
-  }
-
-  ## Reverse gr strand
-  revgr <- gr
-  GenomicRanges::strand(revgr) <- ifelse(as.logical(GenomicRanges::strand(gr)=="-"), "+", "-")
-
-  ## Get TES region coordinates
-if (trim) {
-  tesRegion <- suppressWarnings(GenomicRanges::promoters(revgr,
-                                                         upstream = downstream-1,
-                                                         downstream = upstream+1))
-} else {
-  tesRegion <- GenomicRanges::promoters(revgr,
-                                        upstream = downstream-1,
-                                        downstream = upstream+1)
 }
 
-  ## Reverse back the strand
-  GenomicRanges::strand(tesRegion) <- GenomicRanges::strand(gr)
+## Reverse gr strand
+revgr <- gr
+GenomicRanges::strand(revgr) <- ifelse(
+                                    as.logical(GenomicRanges::strand(gr)=="-"),
+                                    "+",
+                                    "-")
 
-  ## Correct the borders if limitToTSS is TRUE
-  if (limitToTSS) {
-    GenomicRanges::start(tesRegion) <- ifelse(as.logical(GenomicRanges::strand(gr)=="+"),
-                                              pmax(GenomicRanges::start(gr), GenomicRanges::start(tesRegion)),
-                                              GenomicRanges::start(tesRegion))
-    GenomicRanges::end(tesRegion) <- ifelse(as.logical(GenomicRanges::strand(gr)=="+"),
-                                            GenomicRanges::end(tesRegion),
-                                            pmin(GenomicRanges::end(gr), GenomicRanges::end(tesRegion)))
-  }
+## Get TES region coordinates
+if (trim) {
+    tesRegion <- suppressWarnings(
+        GenomicRanges::promoters(revgr,
+                                 upstream = downstream-1,
+                                 downstream = upstream+1))
+} else {
+    tesRegion <- GenomicRanges::promoters(revgr,
+                                          upstream = downstream-1,
+                                          downstream = upstream+1)
+}
 
-  #Limit the region to chromosome borders:
-  if (trim) {
+## Reverse back the strand
+GenomicRanges::strand(tesRegion) <- GenomicRanges::strand(gr)
+
+## Correct the borders if limitToTSS is TRUE
+if (limitToTSS) {
+    GenomicRanges::start(tesRegion) <- ifelse(
+        as.logical(GenomicRanges::strand(gr)=="+"),
+        pmax(GenomicRanges::start(gr), GenomicRanges::start(tesRegion)),
+        GenomicRanges::start(tesRegion))
+    GenomicRanges::end(tesRegion) <- ifelse(
+        as.logical(GenomicRanges::strand(gr)=="+"),
+        GenomicRanges::end(tesRegion),
+        pmin(GenomicRanges::end(gr), GenomicRanges::end(tesRegion)))
+}
+
+#Limit the region to chromosome borders:
+if (trim) {
     tesRegion=GenomicRanges::trim(tesRegion)
-  }
-  return(tesRegion)
+}
+
+return(tesRegion)
 }
 
 
 #' @title Convert an \code{RleList} to a \code{matrix}
 #'
-#' @description Convert an \code{RleList} to a \code{matrix}. The elements of the \code{RleList} should all have the same length.
+#' @description Convert an \code{RleList} to a \code{matrix}. The elements of
+#'              the \code{RleList} should all have the same length.
 #'
 #' @param rlelist An \code{\link{RleList}}
 #'
-#' @return a \code{\link{matrix}} with one row for each element of the \code{RleList}
+#' @return a \code{\link{matrix}} with one row for each element
+#'         of the \code{RleList}
 #'
 #' @importFrom IRanges elementNROWS
 #' @importFrom stats var
@@ -222,32 +270,34 @@ if (trim) {
 RleList2matrix <- function(rlelist = NULL)
 {
 ## Check argument
-  if (is.null(rlelist)) {
+if (is.null(rlelist)) {
     stop("Please provide an RleList to be converted")
-  }
+}
 
-  if (!is(rlelist, "RleList")) {
+if (!is(rlelist, "RleList")) {
     stop("rlelist should be an RleList")
-  }
+}
 
-  if (stats::var(IRanges::elementNROWS(rlelist)) != 0) {
+if (stats::var(IRanges::elementNROWS(rlelist)) != 0) {
     stop("The elements of rlelist should all have the same length")
-  }
+}
 ##Convert to matrix
-  matrix(as.numeric(unlist(rlelist, use.names = FALSE)),
-         nrow = length(rlelist),
-         byrow = TRUE,
-         dimnames = list(names(rlelist),
-                         NULL))
+matrix(as.numeric(unlist(rlelist, use.names = FALSE)),
+       nrow = length(rlelist),
+       byrow = TRUE,
+       dimnames = list(names(rlelist),
+                       NULL))
 }
 
 
 #' @title Convert an \code{matrix} to an \code{RleList}
 #'
-#' @description Convert an \code{matrix} to an \code{RleList}. if mat is not a matrix, a conversion will be attempted.
+#' @description Convert an \code{matrix} to an \code{RleList}.
+#'              if mat is not a matrix, a conversion will be attempted.
 #'
 #'
-#' @param mat A \code{\link{matrix}} to convert as an \code{\link{RleList}}
+#' @param mat A \code{\link{matrix}} to convert as an
+#'            \code{\link[IRanges]{RleList}}
 #'
 #' @return an \code{\link{RleList}}
 #'
@@ -269,22 +319,24 @@ if (is.null(mat)) {
 }
 
 ## If necessary convert mat
-  if (!is.matrix(mat)) {
+if (!is.matrix(mat)) {
     mat <- as.matrix(mat)
     message("mat was converted to a matrix")
-  }
+}
 
 ## Convert to RleList
-  as(apply(mat, 1 , Rle), "RleList")
+as(apply(mat, 1 , Rle), "RleList")
 }
 
 
 #' @title Test if a matrix is a binary matrix
 #'
-#' @description Test if a matrix is a binary matrix (i.e. contains only 0s and 1s (with possibly NA).
+#' @description Test if a matrix is a binary matrix
+#'              (i.e. contains only 0s and 1s, and possibly NA).
 #'              Adapted from https://stackoverflow.com/a/23276062
 #'
-#' @param mat A matrix. If mat is a data frame it will be converted by data.matrix with a warning.
+#' @param mat A matrix. If mat is a data frame it will
+#'            be converted by data.matrix with a warning.
 #'
 #' @return A logical. TRUE if the matrix is binary, FALSE otherwise
 #' @export
@@ -297,12 +349,14 @@ if (is.null(mat)) {
 #' isBinaryMat(x) #FALSE
 #' isBinaryMat(y) #TRUE
 #' isBinaryMat(z) #TRUE
+
 isBinaryMat <- function(mat) {
-  stopifnot(is.matrix(mat) | is.data.frame(mat))
-  if (is.data.frame(mat)) {
-    mat <- data.matrix(mat)
-    warning("mat is a data.frame. A conversion was attempted using data.matrix")
-  }
-  return(identical(as.numeric(mat), as.numeric(as.logical(mat))))
+    stopifnot(is.matrix(mat) | is.data.frame(mat))
+    if (is.data.frame(mat)) {
+        mat <- data.matrix(mat)
+        warning("mat is a data.frame.
+                A conversion was attempted using data.matrix")
+    }
+    return(identical(as.numeric(mat), as.numeric(as.logical(mat))))
 }
 

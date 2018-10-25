@@ -43,12 +43,16 @@ Plots the distribution of intergenic distances by side
 
 ## Extract intergenic distances and stats for these genes:
   randDist <- analyzeNeighborsDistance(GeneList = randGenes,
-                                       GeneNeighborhood = GeneNeighbors)
+                                       GeneNeighborhood = GeneNeighbors,
+                                       nboot=1e3, CItype="perc",
+                                       ncores = 2)
 
 ## Extract the intergenic distances for all non-overlapping genes:
   alldist <- analyzeNeighborsDistance(GeneList = names(Genegr),
                                       GeneNeighborhood = GeneNeighbors,
-                                      DistriTest = FALSE)
+                                      DistriTest = FALSE,
+                                      nboot=1e3, CItype="perc",
+                                      ncores = 2)
 
 ## Select a set of genes with a short upstream distances:
   ### get the upstream distances:
@@ -64,7 +68,9 @@ Plots the distribution of intergenic distances by side
 
 ## Extract intergenic distances and stats for this new set of genes:
   lessRandDist <- analyzeNeighborsDistance(GeneList = lessRandGenes,
-                                           GeneNeighborhood = GeneNeighbors)
+                                           GeneNeighborhood = GeneNeighbors,
+                                           nboot=1e3, CItype="perc",
+                                           ncores = 2)
 
 ## Assemble the data for all genes, random genes and "less random" genes
 ## in a single data frame:

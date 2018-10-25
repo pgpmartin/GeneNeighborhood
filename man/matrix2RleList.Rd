@@ -7,13 +7,15 @@
 matrix2RleList(mat = NULL)
 }
 \arguments{
-\item{mat}{A \code{\link{matrix}} to convert as an \code{\link{RleList}}}
+\item{mat}{A \code{\link{matrix}} to convert as an
+\code{\link[IRanges]{RleList}}}
 }
 \value{
 an \code{\link{RleList}}
 }
 \description{
-Convert an \code{matrix} to an \code{RleList}. if mat is not a matrix, a conversion will be attempted.
+Convert an \code{matrix} to an \code{RleList}.
+             if mat is not a matrix, a conversion will be attempted.
 }
 \examples{
 matrix2RleList(matrix(c(rep(1:3, 3), rep(4:6, 3)), nrow=3))

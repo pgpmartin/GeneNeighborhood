@@ -5,7 +5,9 @@
 \title{Analyze intergenic distances}
 \usage{
 statDistanceSide(GeneNeighborhood = NULL, glist = NULL, guniv = NULL,
-  distest = TRUE, Side = c("Upstream", "Downstream"))
+  distest = TRUE, Side = c("Upstream", "Downstream"),
+  confLevel = 0.95, nboot = 10000, CItype = c("bca", "perc"),
+  ncores = NULL)
 }
 \arguments{
 \item{GeneNeighborhood}{A \code{tibble} obtained with the \code{\link{getGeneNeighborhood}} function. Can also be any data.frame with the relevant information.}
@@ -17,6 +19,14 @@ statDistanceSide(GeneNeighborhood = NULL, glist = NULL, guniv = NULL,
 \item{distest}{A logical (default to TRUE) indicating if genes in glist should be compared to the Universe}
 
 \item{Side}{A character string indicating if the distances to the "Upstream" or "Downstream" genes should be analyzed}
+
+\item{confLevel}{Confidence level for the intervals on the mean and median}
+
+\item{nboot}{Number of bootstrap replicates used to estimate confidence intervals of the mean and median (default to 1e4).}
+
+\item{CItype}{Type of bootstrap confidence interval ("perc" for classical percentile or "bca" for bias-corrected and accelerated intervals). Passed to \code{\link[boot]{boot.ci}} function.}
+
+\item{ncores}{Number of processes for parallel computation (passed to \code{\link[boot]{boot}} function).}
 }
 \value{
 A list containing:
@@ -33,9 +43,9 @@ Extracts the upstream OR downstream intergenic distances and compares their dist
 Note that the function removes overlapping up/downstream genes but not adjacent genes (for which distance = 0).
 When  following \code{distest} is \code{TRUE}, the following tests are performed:
 \itemize{
-  \item Kolmogorov-Smirnov test. See \code{\link{ks.test}}. Although not adapted to integer values that generate ties, this test is generally consistent with the other two.
-  \item Mann-Whithney U test. See \code{\link{wilcox.test}}.
-  \item Independence test. See \code{\link{independence_test}} in the \code{coin} package
+  \item Kolmogorov-Smirnov test. See \code{\link[stats]{ks.test}}. Although not adapted to integer values, it should give concervative p-values for large enough gene sets.
+  \item Mann-Whithney U test. See \code{\link[stats]{wilcox.test}}.
+  \item Independence test. See \code{\link[coin]{independence_test}} in the \code{coin} package
 }
 }
 
@@ -48,8 +58,15 @@ When  following \code{distest} is \code{TRUE}, the following tests are performed
 ## Extract their upstream distances and compare to non selected genes:
   statDistanceSide(GeneNeighborhood = GeneNeighbors,
                    glist = randGenes,
-                   Side = "Upstream")
+                   Side = "Upstream",
+                   nboot = 1e3,
+                   ncores = 2)
 
+}
+\seealso{
+\code{\link[stats]{ks.test}}, \code{\link[stats]{wilcox.test}},
+\code{\link[coin]{independence_test}},
+\code{\link[boot]{boot}}, \code{\link[boot]{boot.ci}}
 }
 \author{
 Pascal GP Martin

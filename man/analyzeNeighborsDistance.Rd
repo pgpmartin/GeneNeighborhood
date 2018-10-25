@@ -5,7 +5,8 @@
 \title{Analyze the distances to the upstream and downstream neighbors, for different categories of orientations (SameStrand / OppositeStrand)}
 \usage{
 analyzeNeighborsDistance(GeneList, GeneNeighborhood = NULL,
-  DistriTest = TRUE, GeneUniverse = NULL)
+  DistriTest = TRUE, GeneUniverse = NULL, confLevel = 0.95,
+  nboot = 10000, CItype = "bca", ncores = NULL)
 }
 \arguments{
 \item{GeneList}{A character vector of "focus" genes to analyze}
@@ -25,6 +26,14 @@ analyzeNeighborsDistance(GeneList, GeneNeighborhood = NULL,
 \item{DistriTest}{A logical (default is TRUE) indicating if the distribution of distances should be compared to the reference universe}
 
 \item{GeneUniverse}{An optional character vector of genes in the universe. By default all genes in \code{GeneNeighborhood} are considered in the Universe.}
+
+\item{confLevel}{Confidence level for the intervals on the mean and median}
+
+\item{nboot}{Number of bootstrap replicates used to estimate confidence intervals of the mean and median}
+
+\item{CItype}{Type of bootstrap confidence interval ("perc" for classical percentile or "bca" for bias-corrected and accelerated intervals). Passed to \code{\link[boot]{boot.ci}} function}
+
+\item{ncores}{Number of processes for parallel computation (passed to \code{\link[boot]{boot}} function).}
 }
 \value{
 A list with:
@@ -58,12 +67,16 @@ The function should thus return results for the following orientations:
   randGenes <- sample(names(Genegr), 100)
 ## Extract all distances and compare them to reference genes:
   NDS <- analyzeNeighborsDistance(GeneList = randGenes,
-                                  GeneNeighborhood = GeneNeighbors)
+                                  GeneNeighborhood = GeneNeighbors,
+                                  nboot = 1e3,
+                                  ncores = 2)
   NDS$stats
 ## Extract the distances for all non-overlapping genes:
   alldist <- analyzeNeighborsDistance(GeneList = names(Genegr),
                                       GeneNeighborhood = GeneNeighbors,
-                                      DistriTest = FALSE)
+                                      DistriTest = FALSE,
+                                      nboot = 1e3,
+                                      ncores = 2)
 ## Some stats on these distances:
   alldist$stats
 

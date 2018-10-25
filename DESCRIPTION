@@ -13,6 +13,7 @@ Depends:
  R (>= 3.4.0)
 Imports: 
     binom,
+    boot,
     coin,
     dplyr,
     GenomeInfoDb,
@@ -24,11 +25,14 @@ Imports:
     magrittr,
     matrixStats,
     methods,
+    parallel,
+    purrr,
     reshape2,
     rlang,
     S4Vectors,
     stats,
     tibble,
+    tidyr,
     utils
 Suggests: 
     knitr,

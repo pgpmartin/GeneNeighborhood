@@ -7,21 +7,23 @@
 profcomp(covr = NULL, woi = NULL)
 }
 \arguments{
-\item{covr}{RleList. A genome-wide coverage (typically obtained with the \code{\link[GenomicRanges]{coverage}} function).}
+\item{covr}{RleList. A genome-wide coverage (typically obtained with
+the \code{\link[GenomicRanges]{coverage}} function).}
 
-\item{woi}{A \code{\link{GRanges}}. Windows of interest, over which to extract the profiles.}
+\item{woi}{A \code{\link{GRanges}}. Windows of interest,
+over which to extract the profiles.}
 }
 \value{
 An RleList with stranded profiles at woi
 }
 \description{
-Extract profiles from a genome-wide coverage on a set of windows of interest. Reverses the profiles for windows that are on the '-' (minus) strand.
+Extract profiles from a genome-wide coverage on a set
+    of windows of interest. Reverses the profiles for windows that
+    are on the '-' (minus) strand.
 }
-\section{DETAILS}{
-
+\details{
 Note that names of covr and seqnames of gr must match
 }
-
 \examples{
 ## Obtain coverage for all genes:
   covr <- GenomicRanges::coverage(Genegr)

@@ -15,12 +15,11 @@ A GRanges of the TES positions
 \description{
 Extract the TES (=end of the gene) from a \code{\link{GRanges}}
 }
-\section{DETAILS}{
-
-The TES is defined as start(gr) when strand(gr)=="+" and as end(gr) when strand(gr)=="-"
+\details{
+The TES is defined as start(gr) when strand(gr)=="+" and
+as end(gr) when strand(gr)=="-"
 The function considers that strand=="*" is equivalent to strand=="+"
 }
-
 \examples{
 ## Get the TSS of genes in GeneGR:
   GenomicRanges::promoters(Genegr, upstream = 0, downstream = 1)

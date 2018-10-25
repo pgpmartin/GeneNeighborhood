@@ -10,10 +10,12 @@ RleList2matrix(rlelist = NULL)
 \item{rlelist}{An \code{\link{RleList}}}
 }
 \value{
-a \code{\link{matrix}} with one row for each element of the \code{RleList}
+a \code{\link{matrix}} with one row for each element
+        of the \code{RleList}
 }
 \description{
-Convert an \code{RleList} to a \code{matrix}. The elements of the \code{RleList} should all have the same length.
+Convert an \code{RleList} to a \code{matrix}. The elements of
+             the \code{RleList} should all have the same length.
 }
 \examples{
 set.seed(123)

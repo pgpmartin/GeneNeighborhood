@@ -7,13 +7,15 @@
 isBinaryMat(mat)
 }
 \arguments{
-\item{mat}{A matrix. If mat is a data frame it will be converted by data.matrix with a warning.}
+\item{mat}{A matrix. If mat is a data frame it will
+be converted by data.matrix with a warning.}
 }
 \value{
 A logical. TRUE if the matrix is binary, FALSE otherwise
 }
 \description{
-Test if a matrix is a binary matrix (i.e. contains only 0s and 1s (with possibly NA).
+Test if a matrix is a binary matrix
+             (i.e. contains only 0s and 1s, and possibly NA).
              Adapted from https://stackoverflow.com/a/23276062
 }
 \examples{

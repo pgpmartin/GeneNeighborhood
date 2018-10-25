@@ -2,7 +2,8 @@
 % Please edit documentation in R/utils.R
 \name{getTESregion}
 \alias{getTESregion}
-\title{Extract a region around the TES (=end of the gene) from a \code{\link{GRanges}}}
+\title{Extract a region around the TES (=end of the gene) from
+    a \code{\link{GRanges}}}
 \usage{
 getTESregion(gr, upstream = 500L, downstream = 501L,
   limitToTSS = FALSE, trim = FALSE)
@@ -10,38 +11,56 @@ getTESregion(gr, upstream = 500L, downstream = 501L,
 \arguments{
 \item{gr}{A \code{\link{GRanges}}.}
 
-\item{upstream}{An integer defining the distance upstream of the TES to extract.}
+\item{upstream}{An integer defining the distance upstream of the
+TES to extract.}
 
-\item{downstream}{An integer defining the distance downstream of the TES to extract.}
+\item{downstream}{An integer defining the distance downstream of
+the TES to extract.}
 
-\item{limitToTSS}{A logical (default to FALSE) indicating if ranges should be trimmed to don't extend upstream of the TSS}
+\item{limitToTSS}{A logical (default to FALSE) indicating if ranges should
+be trimmed to don't extend upstream of the TSS}
 
-\item{trim}{A logical (default to FALSE) indicating if out-of-bound ranges should be trimmed (see ?`trim,GenomicRanges-method`)}
+\item{trim}{A logical (default to FALSE) indicating if out-of-bound ranges
+should be trimmed (see ?`trim,GenomicRanges-method`)}
 }
 \value{
 A GRanges of regions around the TES positions.
 }
 \description{
-Extract a region around the TES (=end of the gene) from a \code{\link{GRanges}}
+Extract a region around the TES (=end of the gene) from
+    a \code{\link{GRanges}}
 }
-\section{DETAILS}{
-
-The TES is defined as start(gr) when strand(gr)=="+" and as end(gr) when strand(gr)=="-"
+\details{
+The TES is defined as start(gr) when strand(gr)=="+" and
+as end(gr) when strand(gr)=="-"
 The function considers that strand=="*" is equivalent to strand=="+"
-To extract 500bp on each side of the TES, use \code{upstream=500} and \code{downstream=501}
+To extract 500bp on each side of the TES,
+use \code{upstream=500} and \code{downstream=501}
 }
-
 \examples{
 ## Get a 50bp region on each side of the TSS of genes in GeneGR:
-  suppressWarnings(GenomicRanges::promoters(Genegr, upstream = 50, downstream = 51))
+  suppressWarnings(
+   GenomicRanges::promoters(Genegr,
+                              upstream = 50,
+                              downstream = 51)
+                  )
 ## Same around the TES:
-  suppressWarnings(getTESregion(Genegr, upstream = 50, downstream = 51))
+  suppressWarnings(
+    getTESregion(Genegr, upstream = 50, downstream = 51)
+    )
 ## Do not extend regions beyond the TSS or Chr1 borders
-  getTESregion(Genegr, upstream = 50, downstream = 51, limitToTSS = TRUE, trim = TRUE)
+  getTESregion(Genegr,
+               upstream = 50,
+               downstream = 51,
+               limitToTSS = TRUE,
+               trim = TRUE)
 
 }
 \seealso{
-promoters flank ?`trim,GenomicRanges-method`
+\code{\link[GenomicRanges:intra-range-methods]{promoters}},
+        \code{\link[GenomicRanges:intra-range-methods]{flank}} and
+        \code{\link[GenomicRanges:intra-range-methods]{trim}}
+        in \code{\link[GenomicRanges:intra-range-methods]{intra-range-methods}}
 }
 \author{
 Pascal GP Martin
