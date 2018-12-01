@@ -292,3 +292,6 @@ plotDistanceDistrib(mydist,
 ```
 
 
+## Metagene profiles
+
+
