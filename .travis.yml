@@ -4,9 +4,15 @@ language: r
 sudo: false
 cache: packages
 
-r:
-  - bioc-release
-  - bioc-devel
+#Exclude osx + bioc-devel as suggested here: https://github.com/irenecrsn/gmat/issues/5
+matrix:
+  include:
+    - os: linux
+      r: bioc-release
+    - os: linux
+      r: bioc-devel
+    - os: osx
+      r: bioc-release
 
 bioc_packages:
   - GenomeInfoDbData
@@ -17,10 +23,6 @@ r_packages:
 
 # Strict checks
 warnings_are_errors: true
-
-os:
-  - linux
-  - osx
 
 after_success:
   - Rscript -e 'covr::codecov(type = "all")'
