@@ -8,8 +8,8 @@
 #'               of genes (ideally defined in a "GeneSet" column)
 #' @param groupcolumn A character string with the name of the column containing
 #'                    the description of the gene sets
-#' @param type A character string in \code{c("ridge", "violin")} indicating
-#'             the type of plot/geom to use
+#' @param type A character string in \code{c("ridge", "violin", "jitterbox")}
+#'             indicating the type of plot/geom to use
 #' @param genesetcols An optional named character vector with colors for the
 #'                    different gene sets
 #'                    (names should correspond to levels of the groupcolumn)
@@ -25,7 +25,7 @@
 #'    scale_fill_hue scale_fill_manual element_text element_blank
 #'    rel expand_scale
 #' @importFrom ggridges geom_density_ridges
-#' @importFrom ggstance geom_violinh
+#' @importFrom ggstance geom_violinh geom_boxploth
 #'
 #' @export
 #'
@@ -34,6 +34,7 @@
 #' @seealso \code{\link[ggplot2]{ggplot2}},
 #'          \code{\link[ggplot2]{ggplot}},
 #'          \code{\link[ggstance]{geom_violinh}},
+#'          \code{\link[ggstance]{geom_boxploth}},
 #'          \code{\link[ggridges]{geom_density_ridges}}
 #'
 #' @examples
@@ -86,7 +87,7 @@
 #'                                   nrow(lessRandDist$distances)))
 #' ## Finally, plot the distribution of distances (density plot):
 #'   plotDistanceDistrib(mydist)
-#' ## Or using violin plots and specific colors and labels
+#' ## Using violin plots and specific colors and labels
 #'   plotDistanceDistrib(mydist,
 #'                       type = "violin",
 #'                       genesetcols = c("All Genes" = "grey",
@@ -95,12 +96,14 @@
 #'                       newlabs = c("All Genes" = "ALL",
 #'                                   "Random Genes" = "Random",
 #'                                   "Less Random genes" = "Close Upstream"))
+#'  ## Adding jitter points and a boxplot under the density plot
+#'   plotDistanceDistrib(mydist, type = "jitterbox")
 #'
 #' @author Pascal GP Martin
 
 plotDistanceDistrib <- function(distdf,
                                   groupcolumn = "GeneSet",
-                                  type = c("ridge", "violin"),
+                                  type = c("ridge", "violin", "jitterbox"),
                                   genesetcols=NULL, newlabs=NULL) {
 
 . <- Distance <- GeneSet <- NULL #avoids check errors due to non std eval
@@ -155,12 +158,17 @@ if (!is.factor(distdf$GeneSet)) {
 
 ## Define geom
   if (type=="ridge") {
-    geomFUN <- ggridges::geom_density_ridges(scale=0.9)
+    geomFUN <- ggridges::geom_density_ridges(scale=.9, alpha = .8)
   }
   if (type=="violin") {
-    geomFUN <- ggstance::geom_violinh(draw_quantiles = 0.5)
+    geomFUN <- ggstance::geom_violinh(draw_quantiles = .5, alpha = .8)
   }
-
+  if (type=="jitterbox") {
+      geomFUN <- ggridges::geom_density_ridges(scale=.7,
+                                    position = position_nudge(x = 0,
+                                                              y = .1),
+                                    alpha=.8)
+  }
 
 ## Prepare the plot
 pp <- ggplot2::ggplot(distdf,
@@ -197,6 +205,19 @@ pp <- ggplot2::ggplot(distdf,
                          size = ggplot2::rel(1.2),
                          color = "black"))
 
+if (type == "jitterbox") {
+    pp <- pp +
+        ggplot2::geom_jitter(height = .1,
+                             size = .5,
+                             alpha = 0.6,
+                             show.legend = FALSE,
+                             col="#999999") +
+        ggstance::geom_boxploth(width=0.1,
+                                fatten = 1.5,
+                                outlier.shape = NA,
+                                show.legend = FALSE,
+                                alpha = 0.3)
+}
 
 ## Facet by Side and Orientation
 pp <- pp + ggplot2::facet_grid(Orientation~Side)
@@ -223,6 +244,11 @@ if (type=="ridge") {
 if (type == "violin")
 {
   expY <- c(0.6, 0.6)
+}
+
+if (type == "jitterbox")
+{
+    expY <- c(0.2, 1)
 }
 
 if (is.null(newlabs)) {

@@ -284,3 +284,11 @@ Or using violin plots:
 plotDistanceDistrib(mydist,
                     type = "violin")
 ```
+
+When relatively few genes are analyzed, it is worth looking at individual points. They can be plotted along with a boxplot, under the density plots, using:
+```{r plotDistanceDistribJitter, message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7}
+plotDistanceDistrib(mydist,
+                    type = "jitterbox")
+```
+
+

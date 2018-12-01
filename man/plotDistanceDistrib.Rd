@@ -5,7 +5,7 @@
 \title{plot the distribution of intergenic distances}
 \usage{
 plotDistanceDistrib(distdf, groupcolumn = "GeneSet", type = c("ridge",
-  "violin"), genesetcols = NULL, newlabs = NULL)
+  "violin", "jitterbox"), genesetcols = NULL, newlabs = NULL)
 }
 \arguments{
 \item{distdf}{A data frame or tibble containing distances for different sets
@@ -14,8 +14,8 @@ of genes (ideally defined in a "GeneSet" column)}
 \item{groupcolumn}{A character string with the name of the column containing
 the description of the gene sets}
 
-\item{type}{A character string in \code{c("ridge", "violin")} indicating
-the type of plot/geom to use}
+\item{type}{A character string in \code{c("ridge", "violin", "jitterbox")}
+indicating the type of plot/geom to use}
 
 \item{genesetcols}{An optional named character vector with colors for the
 different gene sets
@@ -83,7 +83,7 @@ Plots the distribution of intergenic distances by side
                                   nrow(lessRandDist$distances)))
 ## Finally, plot the distribution of distances (density plot):
   plotDistanceDistrib(mydist)
-## Or using violin plots and specific colors and labels
+## Using violin plots and specific colors and labels
   plotDistanceDistrib(mydist,
                       type = "violin",
                       genesetcols = c("All Genes" = "grey",
@@ -92,12 +92,15 @@ Plots the distribution of intergenic distances by side
                       newlabs = c("All Genes" = "ALL",
                                   "Random Genes" = "Random",
                                   "Less Random genes" = "Close Upstream"))
+ ## Adding jitter points and a boxplot under the density plot
+  plotDistanceDistrib(mydist, type = "jitterbox")
 
 }
 \seealso{
 \code{\link[ggplot2]{ggplot2}},
          \code{\link[ggplot2]{ggplot}},
          \code{\link[ggstance]{geom_violinh}},
+         \code{\link[ggstance]{geom_boxploth}},
          \code{\link[ggridges]{geom_density_ridges}}
 }
 \author{
