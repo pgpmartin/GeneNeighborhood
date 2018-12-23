@@ -145,6 +145,8 @@ Add an example with multiple groups
 
 ## Analyze the proximity of the neighbors
 
+<!-- TODO. Update this section with new functions getDistSide, dist2Neighbors, testDistances and DistanceStats-->
+
   Whether or not there is a significant enrichment for a given orientation, we may ask if the gene neighbors are located at a specific distance from the focus genes, i.e. closer or farther than expected.  
 
 ### Analysis of a random set of genes:  
@@ -231,6 +233,8 @@ names(updist) <- alldist$distances$GeneName[alldist$distances$Side=="Upstream"]
   Then we define a probability of selecting the gene that is inversely proportional to its upstream distance:
 ```{r probs}
 updistQ <- pmin(updist, quantile(updist,0.99)) #We replace extreme values by the 99th percentile
+updistQ[updistQ<1e3] <- floor(updistQ[updistQ<1e3]/2) #we give more weight to distances below 1Kb
+updistQ[updistQ>1e3] <- pmax(updistQ[updistQ>1e3]*1.5, max(updistQ)) #and less weight to distances above 1Kb
 probs <- (max(updistQ) - updistQ) / 
          sum(max(updistQ) - updistQ)
 ```
@@ -285,7 +289,7 @@ plotDistanceDistrib(mydist,
                     type = "violin")
 ```
 
-When relatively few genes are analyzed, it is worth looking at individual points. They can be plotted along with a boxplot, under the density plots, using:
+When relatively few genes are analyzed, it is worth looking at individual points. They can be plotted, along with a boxplot, under the density plots, using:
 ```{r plotDistanceDistribJitter, message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7}
 plotDistanceDistrib(mydist,
                     type = "jitterbox")
@@ -293,5 +297,148 @@ plotDistanceDistrib(mydist,
 
 
 ## Metagene profiles
+
+Another way to study the neighborhood of a set of genes is to produce an average profile representing the coverage of gene annotations in regions surrounding the borders of genes in this set.  
+Such a representation provides information on both the orientation and the distance of the neighbors. It also allows to compare different groups of genes.  
+
+The steps to obtain these profiles are:  
+
+  - Calculate the strand-specific coverage of gene annotations (possibly after reducing the gene ranges, see `usePercent` argument below)  
+  - For each gene, extract the coverage on both strands in windows covering the gene body and regions on each side of the gene body (region length defined by the `sidedist` argument)  
+  - Average the signal on the gene body in a fixed number of bins in order to align the signal from genes of different lengths (number of bins defined by the `nbins` argument).  
+  - Combine and reverse the signals appropriately in order to get aligned signal at and around each gene on the *Sense strand* (strand on which the gene is annotated) and *Antisense strand* (strand opposite to the gene's annotation).  
+
+When gene annotations overlap on the same strand, we can decide to keep this information (i.e. we can get coverage values >1) or to only focus on presence/absence of annotations (i.e. strand-specific coverage is 0 or 1) using the argument `usePercent = TRUE` (in this case, the average of 0/1 values for aligned signals is a percentage of bases covered with annotations).  
+
+To extract +/-2Kb of signal on each side of all genes:
+```{r}
+Prof <- annotationCoverageAroundFeatures(gn,
+                                         sidedist = 2000,
+                                         usePercent = TRUE,
+                                         nbins=10)
+```
+
+```{r, include= FALSE, eval=FALSE}
+#Prof may be pre-compiled to avoid long computation?
+# For alternative option, see 
+#https://community.rstudio.com/t/precompiling-vignette-with-devtools/1583/2
+#https://community.rstudio.com/t/vignettes-that-require-locally-stored-data/2392/2
+
+Prof <- readRDS("Prof.rds")
+```
+
+The `Prof` object is a list with elements:  
+```{r, echo=FALSE}
+cat(paste(names(Prof), collapse="\n"))
+```
+
+Each element is an `RleList` containing the strand-specific coverage of annotations on the gene body (*Feature*), in the region (-2kb to the start of the gene) located upstream of the genes (*UpstreamBorder*) and in the region (end of the gene to +2kb) located downstream of the genes (*DownstreamBorder*).   
+  The *Sense* strand is the strand on which the focus gene (*Feature*) is annotated and the *Antisense* strand is the opposite strand.   
+
+  These elements are now assembled into gene-level vectors containing the upstream region, gene body and downstream region:
+```{r}
+Prof <- assembleProfiles(Prof)
+```
+  
+
+Now we define groups of genes on which we want to calculate an average profile and its associated confidence interval:
+```{r}
+GeneGroups <- list("AllGenes" = names(gn),
+                   "RandomGenes" = randGenes,
+                   "CloseNeighbors" = closeUpstreamNeighbors)
+```
+
+For each group, we then calculate the average profile and 95% confidence interval:
+
+```{r}
+avgProf <- list()
+for (i in 1:length(GeneGroups)) {
+  avgProf[[i]] <- list()
+  avgProf[[i]]$sense <- getAvgProfileWithCI(Prof$Profiles_Sense,
+                                            selFeatures = GeneGroups[[i]],
+                                            pos = c(-2000:0, 1:10, 0:2000))
+  avgProf[[i]]$antisense <- getAvgProfileWithCI(Prof$Profiles_Antisense,
+                                                selFeatures = GeneGroups[[i]],
+                                                pos = c(-2000:0, 1:10, 0:2000))
+}
+names(avgProf) <- names(GeneGroups)
+
+```
+
+Before plotting, we need to assemble these profiles in a single table. We must provide the x-coordinates for these "metagene" profiles. The x-coordinates should be in [0,5] with the upstream region covering [0,2[, the TSS having x-coordinate 2, the gene body covering ]2,3[, the TSS having coordinate 3 and the downstream region covering ]3,5].
+```{r}
+xcoord = c(seq(0, 2, length.out = 2001),
+           seq(2, 3, length.out = 12)[2:11],
+           seq(3, 5, length.out = 2001))
+```
+
+<!-- TODO. Add a column or attributes in the profiles indicating where the upstream, gene body and downstream regions are located. In this way the user does not have to define x-coord-->
+
+And we assemble the metagene profiles in a data.frame with:
+```{r}
+avgProf_df <- reshape2::melt(avgProf,
+                             measure.vars = "Profile", value.name = "Profile") %>%
+                  dplyr::rename("Strand" = "L2",
+                                "GeneSet" = "L1") %>%
+                  dplyr::mutate(Xcoord=rep(xcoord, 2*length(GeneGroups)))
+```
+
+
+Now these profiles can be plotted:
+```{r}
+plotMetageneAnnotProfile(avgProf_df, usePercent = TRUE)
+```
+
+By default, the plot goes all the way up to 100% coverage, which is the value on the gene body for the sense strand. To change this behavior, we can use:
+
+```{r}
+plotMetageneAnnotProfile(avgProf_df, usePercent = TRUE) +
+    ggplot2::coord_cartesian(ylim=c(0,50))
+```
+
+
+
+## Distance to single-point features
+
+One limitation of these average profiles is that all the length of the neighborhing genes/features is taken into account to produce the profiles. For example, we see the enrichment of close upstream neighbors in the average profiles ("CloseNeighbors" group), but we cannot directly answer a question such as: *"What is the fraction of genes from this (and other) set that have a neighboring TES, on the same strand, at less than 600bp"*.  
+
+In order to do this, we first extract the TES, which are *"single-point features"* located at the (3') end of the genes.
+```{r}
+tes <- getTES(gn)
+```
+
+If we were interested in TSS (transcription start site), we could get their coordinates using:
+```{r, eval=FALSE}
+tss <- GenomicRanges::promoters(gn, upstream = 0, downstream = 1)
+```
+
+Then we extract the coverage of TES around the genes (here +/- 1kb) using (we only use 3 bins for each gene as we are not interested to look at gene bodies here) :
+```{r}
+tescov <- annotationCoverageAroundFeatures(annot = tes, 
+                                           features = gn, 
+                                           sidedist = 2000, 
+                                           usePercent = TRUE,
+                                           nbins = 3)
+```
+
+Now, in order to obtain cumulative presence of TES as we move away from the border of our genes of interest, we first extend the "presence" (coverage=1) value of each TES to any distance larger than the location of each TES. For example, if a TES is found at 100bp upstream of a gene, then we count it as "present" (coverage =1) at any distance $\ge$100bp.
+```{r}
+extTEScov <- extendPointPresence(tescov, sidedist = 2000) 
+```
+
+For different groups of genes we now obtain the cumulative percentage of genes that have a TES at less than a given distance with:
+```{r}
+cumulTES <- getCumulPercentProfiles(extTEScov,
+                                    genesets = GeneGroups)
+```
+
+and plot the results:
+```{r}
+plotCumulPercentProfile(cumulTES)
+```
+
+
+
+## Case studies
 
 

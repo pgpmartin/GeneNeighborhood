@@ -240,6 +240,17 @@ res <- list()
             tibble::as_tibble()
 }
 
+#Adjust the Side and Orientation columns (for stat tables and plotting)
+res <- res %>%
+    dplyr::mutate(Side = factor(.data$Side,
+                                levels=c("Upstream",
+                                         "Downstream"),
+                                ordered = TRUE),
+                  Orientation = factor(.data$Orientation,
+                                       levels = c("SameStrand",
+                                                  "OppositeStrand"),
+                                       ordered = TRUE))
+
 return(res)
 
 }

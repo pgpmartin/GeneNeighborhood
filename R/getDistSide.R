@@ -24,6 +24,10 @@
 #'   \item Distance in bp
 #' }
 #'
+#' @section DETAILS:
+#' Note that the function removes overlapping upstream/downstream genes
+#' but not adjacent genes (for which distance = 0).
+#'
 #' @seealso \code{\link{getGeneNeighborhood}}
 #'          \code{\link{dist2Neighbors}}
 #'
@@ -81,19 +85,20 @@ getDistSide <- function(GNN,
         dplyr::pull(isOVL)
 
     if (any(isOVL)) {
-        message(sum(isOVL), paste0(" genes with an overlapping ",
-                                   tolower(Side),
-                                   " gene are removed from Geneset"))
+        message(sum(isOVL),
+                paste0(" genes with an overlapping ",
+                       tolower(Side),
+                       " gene are removed from Geneset"))
         glistSel <- glistSel[!isOVL]
     }
 
     ##Count the remaining genes
     ngSel <- length(glistSel) #Number of genes with Upstream or Downstream info
-    cat("Final number of genes with",
+    message("Final number of genes with ",
         tolower(Side),
-        "gene data:",
+        " gene data: ",
         ngSel,
-        "genes\n")
+        " genes")
 
     ##Extract distances
     res <- GNNdata %>%

@@ -29,6 +29,12 @@ A tibble with the following columns:
 \description{
 Extract distances to the upstream or downstream neighbors
 }
+\section{DETAILS}{
+
+Note that the function removes overlapping upstream/downstream genes
+but not adjacent genes (for which distance = 0).
+}
+
 \examples{
 ## Obtain gene neighborhood information:
   GeneNeighbors <- getGeneNeighborhood(Genegr)
