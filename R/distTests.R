@@ -74,8 +74,8 @@
 
 
 distTests <- function(GeneSetDistances,
-                      Universe=NULL,
-                      type=c("ks", "wilcox", "indep", "resample"),
+                      Universe = NULL,
+                      MedianResample = TRUE,
                       R = 1e4) {
 
 #-----------
@@ -123,8 +123,30 @@ gs <- dplyr::left_join(
     by = c("Side", "Orientation")
 )
 
+# I don't like this solution above because we copy several times the values for DistUniv
+#This is probably better:
+# gs2 <-dplyr::right_join(
+#     GeneSetDistances %>%
+#         dplyr::filter(.data$GeneSet != Universe) %>%
+#         dplyr::select(-.data$Neighbor) %>%
+#         dplyr::group_by(.data$GeneSet, .data$Side, .data$Orientation) %>%
+#         tidyr::nest(.key = "DistSet") %>%
+#         tidyr::spread(key="GeneSet", value="DistSet"), #can be combined with right_join to avoid repeating the Universe data set
+#
+#     GeneSetDistances %>%
+#         dplyr::filter(.data$GeneSet == Universe) %>%
+#         dplyr::select(-.data$Neighbor, -.data$GeneSet) %>%
+#         dplyr::group_by(.data$Side, .data$Orientation) %>%
+#         tidyr::nest(.key = "DistUniv"),
+#
+#     by = c("Side", "Orientation")
+# )
+#
+# object.size(gs) #174680 bytes
+# object.size(gs2) #104056 bytes # much better
+
 #-----------
-# Function to calculate p-values
+# Functions to calculate p-values
 #-----------
 #Kolmogorov-Smirnov
 ksfun <- function(.x, .y) {
@@ -153,6 +175,14 @@ coinIndep <- function(.x, .y) {
     coin::pvalue(coin::independence_test(df$Distance ~ df$isInTestSet))
 }
 
+#Resampling test on the median
+resampMed <- function(.x, .y, R=1e4) {
+    refmed <- median(.x %>% dplyr::pull(.data$Distance))
+    univdist <- .y %>% dplyr::pull(.data$Distance)
+    ngenes <- nrow(.x)
+    mean(matrixStats::colMedians(replicate(R, sample(univdist, ngenes)))<=refmed)
+}
+
 # TODO: Evaluate the distributions of p-values on 10000 random gene sets
 
 #-----------
@@ -169,6 +199,14 @@ gs %<>%
                   Indep.pvalue = purrr::map2_dbl(.x = .data$DistSet,
                                                  .y = .data$DistUniv,
                                                  coinIndep))
+
+if (MedianResample) {
+    gs %<>%
+        dplyr::mutate(Median_resample = purrr::map2_dbl(.x = .data$DistSet,
+                                                  .y = .data$DistUniv,
+                                                  resampMed,
+                                                  R=R))
+}
 
 ## See https://robertamezquita.github.io/post/2017-05-23-using-map-with-generic-functions-like-t-test/
 ## https://stackoverflow.com/questions/35558766/purrr-map-a-t-test-onto-a-split-df
