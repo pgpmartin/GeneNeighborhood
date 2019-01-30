@@ -62,6 +62,7 @@
 #'   GenePool <- GeneNeighbors[!is.na(GeneNeighbors$UpstreamDistance),]
 #'   Proba <- (max(GenePool$UpstreamDistance)-GenePool$UpstreamDistance) /
 #'              sum(max(GenePool$UpstreamDistance)-GenePool$UpstreamDistance)
+#'   Proba <- (1/(GenePool$UpstreamDistance+1)) / sum(1/(GenePool$UpstreamDistance+1))
 #'   CloseUpstream <- sample(GenePool$GeneName, size = 100, prob = Proba)
 #' ## Extract distances for this set of genes and for all genes :
 #'  myGeneSets <- list("RandomGenes" = randGenes,
@@ -125,31 +126,25 @@ gs <- dplyr::left_join(
 
 # I don't like this solution above because we copy several times the values for DistUniv
 #This is probably better:
-# gs2 <-dplyr::right_join(
-#     GeneSetDistances %>%
-#         dplyr::filter(.data$GeneSet != Universe) %>%
-#         dplyr::select(-.data$Neighbor) %>%
-#         dplyr::group_by(.data$GeneSet, .data$Side, .data$Orientation) %>%
-#         tidyr::nest(.key = "DistSet") %>%
-#         tidyr::spread(key="GeneSet", value="DistSet"), #can be combined with right_join to avoid repeating the Universe data set
-#
-#     GeneSetDistances %>%
-#         dplyr::filter(.data$GeneSet == Universe) %>%
-#         dplyr::select(-.data$Neighbor, -.data$GeneSet) %>%
-#         dplyr::group_by(.data$Side, .data$Orientation) %>%
-#         tidyr::nest(.key = "DistUniv"),
-#
-#     by = c("Side", "Orientation")
-# )
-#
-# object.size(gs) #174680 bytes
-# object.size(gs2) #104056 bytes # much better
+# gs <- GeneSetDistances %>%
+#     dplyr::select(-.data$Neighbor) %>%
+#     dplyr::group_by(.data$GeneSet, .data$Side, .data$Orientation) %>%
+#     tidyr::nest(.key = "DistSet") %>%
+#     tidyr::spread(key="GeneSet", value="DistSet")
+#Or this
+# gs <- GeneSetDistances %>%
+#     dplyr::select(-.data$Neighbor) %>%
+#     dplyr::group_by(.data$Side, .data$Orientation) %>%
+#     tidyr::nest(.key = "DistSet")
+
 
 #-----------
 # Functions to calculate p-values
 #-----------
+
 #Kolmogorov-Smirnov
 ksfun <- function(.x, .y) {
+if (nrow(.x)>0) {
     suppressWarnings(
         ks.test(.x %>% dplyr::pull(.data$Distance),
                 .y %>%
@@ -157,33 +152,38 @@ ksfun <- function(.x, .y) {
                     dplyr::pull(.data$Distance),
                 exact = FALSE)$p.value
         )
+} else {NA}
 }
 
 #Mann-Whitney U-test:
 Utest <- function(.x, .y) {
+if (nrow(.x)>0) {
     wilcox.test(.x %>% dplyr::pull(.data$Distance),
                 .y %>%
                     dplyr::filter(!(.data$GeneName %in% .x$GeneName)) %>%
                     dplyr::pull(.data$Distance),
             paired = FALSE)$p.value
+} else {NA}
 }
 
 #coin independence test:
 coinIndep <- function(.x, .y) {
-    df <- dplyr::union(.x, .y) %>%
-              dplyr::mutate(isInTestSet = .data$GeneName %in% .x$GeneName)
-    coin::pvalue(coin::independence_test(df$Distance ~ df$isInTestSet))
+    if (nrow(.x)>0) {
+        df <- dplyr::union(.x, .y) %>%
+                  dplyr::mutate(isInTestSet = .data$GeneName %in% .x$GeneName)
+        coin::pvalue(coin::independence_test(df$Distance ~ df$isInTestSet))
+    } else {NA}
 }
 
 #Resampling test on the median
 resampMed <- function(.x, .y, R=1e4) {
-    refmed <- median(.x %>% dplyr::pull(.data$Distance))
-    univdist <- .y %>% dplyr::pull(.data$Distance)
-    ngenes <- nrow(.x)
-    mean(matrixStats::colMedians(replicate(R, sample(univdist, ngenes)))<=refmed)
+    if (nrow(.x)>0) {
+        refmed <- median(.x %>% dplyr::pull(.data$Distance))
+        univdist <- .y %>% dplyr::pull(.data$Distance)
+        ngenes <- nrow(.x)
+        mean(matrixStats::colMedians(replicate(R, sample(univdist, ngenes)))<=refmed)
+    } else {NA}
 }
-
-# TODO: Evaluate the distributions of p-values on 10000 random gene sets
 
 #-----------
 # Add p-values to the table
@@ -207,6 +207,10 @@ if (MedianResample) {
                                                   resampMed,
                                                   R=R))
 }
+
+gs <- gs %>% dplyr::select(-.data$DistSet, -.data$DistUniv)
+
+return(gs)
 
 ## See https://robertamezquita.github.io/post/2017-05-23-using-map-with-generic-functions-like-t-test/
 ## https://stackoverflow.com/questions/35558766/purrr-map-a-t-test-onto-a-split-df
