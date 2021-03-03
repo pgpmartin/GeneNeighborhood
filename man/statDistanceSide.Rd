@@ -4,10 +4,17 @@
 \alias{statDistanceSide}
 \title{Analyze intergenic distances}
 \usage{
-statDistanceSide(GeneNeighborhood = NULL, glist = NULL, guniv = NULL,
-  distest = TRUE, Side = c("Upstream", "Downstream"),
-  confLevel = 0.95, nboot = 10000, CItype = c("bca", "perc"),
-  ncores = NULL)
+statDistanceSide(
+  GeneNeighborhood = NULL,
+  glist = NULL,
+  guniv = NULL,
+  distest = TRUE,
+  Side = c("Upstream", "Downstream"),
+  confLevel = 0.95,
+  nboot = 10000,
+  CItype = c("bca", "perc"),
+  ncores = NULL
+)
 }
 \arguments{
 \item{GeneNeighborhood}{A \code{tibble} obtained with the \code{\link{getGeneNeighborhood}} function. Can also be any data.frame with the relevant information.}

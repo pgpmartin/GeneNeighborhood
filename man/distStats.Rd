@@ -4,8 +4,13 @@
 \alias{distStats}
 \title{Descriptive statistics on intergenic distance data}
 \usage{
-distStats(GeneSetDistances, confLevel = 0.95, nboot = 10000,
-  CItype = c("bca", "perc"), ncores = NULL)
+distStats(
+  GeneSetDistances,
+  confLevel = 0.95,
+  nboot = 10000,
+  CItype = c("bca", "perc"),
+  ncores = NULL
+)
 }
 \arguments{
 \item{GeneSetDistances}{A \code{tibble} with intergenic distances for the

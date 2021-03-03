@@ -4,8 +4,13 @@
 \alias{plotDistanceDistrib}
 \title{plot the distribution of intergenic distances}
 \usage{
-plotDistanceDistrib(distdf, groupcolumn = "GeneSet", type = c("ridge",
-  "violin", "jitterbox"), genesetcols = NULL, newlabs = NULL)
+plotDistanceDistrib(
+  distdf,
+  groupcolumn = "GeneSet",
+  type = c("ridge", "violin", "jitterbox"),
+  genesetcols = NULL,
+  newlabs = NULL
+)
 }
 \arguments{
 \item{distdf}{A data frame or tibble containing distances for different sets

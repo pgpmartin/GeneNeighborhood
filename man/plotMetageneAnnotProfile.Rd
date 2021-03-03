@@ -4,8 +4,12 @@
 \alias{plotMetageneAnnotProfile}
 \title{Plot metagene annotation profiles for different groups of genes.}
 \usage{
-plotMetageneAnnotProfile(avgprofs, gscolors = NULL, usePercent = FALSE,
-  freeY = FALSE)
+plotMetageneAnnotProfile(
+  avgprofs,
+  gscolors = NULL,
+  usePercent = FALSE,
+  freeY = FALSE
+)
 }
 \arguments{
 \item{avgprofs}{A data frame with average profiles for different groups of genes (or "gene sets"). The object should contain the following columns:

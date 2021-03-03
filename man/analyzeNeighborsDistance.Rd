@@ -4,9 +4,16 @@
 \alias{analyzeNeighborsDistance}
 \title{Analyze the distances to the upstream and downstream neighbors, for different categories of orientations (SameStrand / OppositeStrand)}
 \usage{
-analyzeNeighborsDistance(GeneList, GeneNeighborhood = NULL,
-  DistriTest = TRUE, GeneUniverse = NULL, confLevel = 0.95,
-  nboot = 10000, CItype = "bca", ncores = NULL)
+analyzeNeighborsDistance(
+  GeneList,
+  GeneNeighborhood = NULL,
+  DistriTest = TRUE,
+  GeneUniverse = NULL,
+  confLevel = 0.95,
+  nboot = 10000,
+  CItype = "bca",
+  ncores = NULL
+)
 }
 \arguments{
 \item{GeneList}{A character vector of "focus" genes to analyze}

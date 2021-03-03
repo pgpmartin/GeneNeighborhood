@@ -4,8 +4,11 @@
 \alias{dist2Neighbors}
 \title{Extract distances to the upstream and downstream neighbors}
 \usage{
-dist2Neighbors(GeneNeighborhood = NULL, geneset = NULL,
-  genesetName = "GeneSet")
+dist2Neighbors(
+  GeneNeighborhood = NULL,
+  geneset = NULL,
+  genesetName = "GeneSet"
+)
 }
 \arguments{
 \item{GeneNeighborhood}{A \code{tibble} obtained with the

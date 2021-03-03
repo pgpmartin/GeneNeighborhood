@@ -91,7 +91,7 @@ table(table(GeneNeighbors$GenePair))
 
 
 set.seed(123)
-#The package includes a \\code{GRanges} named Genegr with 676 random genes on a single chromosome:
+#The package includes a \code{GRanges} named Genegr with 676 random genes on a single chromosome:
   Genegr
 
 #Extract info on the neighbors of these genes:

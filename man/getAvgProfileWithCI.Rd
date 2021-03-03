@@ -4,8 +4,13 @@
 \alias{getAvgProfileWithCI}
 \title{Compute the average profile and its confidence interval for a selection of features}
 \usage{
-getAvgProfileWithCI(FeatureProfiles, selFeatures = NULL, pos = NULL,
-  conf = 0.95, type = c("mean", "freq", "avgnorm", "sum", "n"))
+getAvgProfileWithCI(
+  FeatureProfiles,
+  selFeatures = NULL,
+  pos = NULL,
+  conf = 0.95,
+  type = c("mean", "freq", "avgnorm", "sum", "n")
+)
 }
 \arguments{
 \item{FeatureProfiles}{Matrix (features in row, position in columns) or RleList with coverage profiles for a set of features}

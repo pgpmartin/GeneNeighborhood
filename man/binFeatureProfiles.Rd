@@ -4,8 +4,14 @@
 \alias{binFeatureProfiles}
 \title{Bin coverage profiles given as a matrix or RleList of profiles.}
 \usage{
-binFeatureProfiles(FeatureProfiles, nbins = 100L, binwidth = NULL,
-  aggregFUN = "mean", asMatrix = FALSE, ...)
+binFeatureProfiles(
+  FeatureProfiles,
+  nbins = 100L,
+  binwidth = NULL,
+  aggregFUN = "mean",
+  asMatrix = FALSE,
+  ...
+)
 }
 \arguments{
 \item{FeatureProfiles}{A \code{\link{matrix}} (with features in row and genomic positions in column) or \code{\link{RleList}}, typically obtained with the \code{\link{profcomp}} function.}

@@ -271,7 +271,9 @@ distsum <- distByClass %>%
     ) %>%
     dplyr::select(-.data$data, -.data$bootSamples,
                   -.data$bootCI_median, -.data$bootCI_mean) %>%
-    tidyr::unnest()
+    tidyr::unnest(cols = c(n, Min, Q1, Median, Median_lowerCI, Median_upperCI,
+                           Mean, Mean_lowerCI, Mean_upperCI,
+                           Q3, Max, SD, SEM))
 
   #Compare to universe
   if (distest) {
