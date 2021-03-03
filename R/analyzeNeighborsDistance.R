@@ -57,7 +57,7 @@
 #'                    glist = randGenes,
 #'                    Side = "Upstream",
 #'                    nboot = 1e3,
-#'                    ncores = 2)
+#'                    ncores = 3)
 #'
 #' @author Pascal GP Martin
 #'
@@ -271,9 +271,10 @@ distsum <- distByClass %>%
     ) %>%
     dplyr::select(-.data$data, -.data$bootSamples,
                   -.data$bootCI_median, -.data$bootCI_mean) %>%
-    tidyr::unnest(cols = c(n, Min, Q1, Median, Median_lowerCI, Median_upperCI,
-                           Mean, Mean_lowerCI, Mean_upperCI,
-                           Q3, Max, SD, SEM))
+    tidyr::unnest(cols = c(.data$n, .data$Min, .data$Q1, .data$Median,
+                           .data$Median_lowerCI, .data$Median_upperCI,
+                           .data$Mean, .data$Mean_lowerCI, .data$Mean_upperCI,
+                           .data$Q3, .data$Max, .data$SD, .data$SEM))
 
   #Compare to universe
   if (distest) {
@@ -638,10 +639,10 @@ cat("\n",
                   .data$Distance)
 
   #statistics
-  res$stats <- dplyr::bind_rows(upres$stats, dnres$stats) %>%
-    dplyr::mutate(Side = factor(rep(c("Upstream", "Downstream"),
-                                    times = c(nrow(upres$stats),
-                                              nrow(dnres$stats))),
+  res$stats <- dplyr::bind_rows("Upstream" = upres$stats,
+                                "Downstream" = dnres$stats,
+                                .id="Side") %>%
+    dplyr::mutate(Side = factor(Side,
                                 levels = c("Upstream", "Downstream"),
                                 ordered = TRUE)) %>%
     dplyr::rename("Orientation" = "SideClass")
