@@ -421,7 +421,7 @@ tescov <- annotationCoverageAroundFeatures(annot = tes,
                                            nbins = 3)
 ```
 
-Now, in order to obtain cumulative presence of TES as we move away from the border of our genes of interest, we first extend the "presence" (coverage=1) value of each TES to any distance larger than the location of each TES. For example, if a TES is found at 100bp upstream of a gene, then we count it as "present" (coverage =1) at any distance $\ge$100bp.
+Now, in order to obtain cumulative presence of TES as we move away from the border of our genes of interest, we first extend the "presence" (coverage=1) value of each TES to any distance larger than the location of each TES. For example, if a TES is found at 100bp upstream of a gene, then we count it as "present" (coverage =1) for any distance greater or equal to 100bp.
 ```{r}
 extTEScov <- extendPointPresence(tescov, sidedist = 2000) 
 ```

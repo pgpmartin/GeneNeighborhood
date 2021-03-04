@@ -2,9 +2,9 @@
 % Please edit documentation in R/distTests.R
 \name{pvalByGeneSet}
 \alias{pvalByGeneSet}
-\title{Apply a test to different genesets using the same refereence/control set}
+\title{Apply a test to different genesets using the same reference/control set}
 \usage{
-pvalByGeneSet(tbdist, univ = Universe, FUN, ...)
+pvalByGeneSet(tbdist, univ = "Universe", FUN, ...)
 }
 \arguments{
 \item{tbdist}{A data frame with the following columns:
@@ -28,7 +28,7 @@ and returns a single p-value.}
 A tibble with 2 columns: GeneSet and pvalue
 }
 \description{
-Apply a test to different genesets using the same refereence/control set
+Apply a test to different genesets using the same reference/control set
 }
 \examples{
 ## Create some random distance data

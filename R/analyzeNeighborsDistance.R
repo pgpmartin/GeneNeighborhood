@@ -642,7 +642,7 @@ cat("\n",
   res$stats <- dplyr::bind_rows("Upstream" = upres$stats,
                                 "Downstream" = dnres$stats,
                                 .id="Side") %>%
-    dplyr::mutate(Side = factor(Side,
+    dplyr::mutate(Side = factor(.data$Side,
                                 levels = c("Upstream", "Downstream"),
                                 ordered = TRUE)) %>%
     dplyr::rename("Orientation" = "SideClass")

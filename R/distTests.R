@@ -1,8 +1,15 @@
-#' Compare 2 sets of distances with a Kolmogorov-Smirnov test
+#' @title Kolmogorov-Smirnov test on genomic distances
+#'
+#' @description Compare 2 sets of distances with a Kolmogorov-Smirnov test
 #' (only returns the p-value)
 #'
 #' @param .x A data frame with distances for the gene set of interest.
 #' @param .y A data frame with distances for the control/reference gene set.
+#'
+#' @importFrom stats ks.test
+#' @importFrom dplyr filter pull
+#'
+#' @export
 #'
 #' @section DETAILS:
 #' Both \code{.x} and \code{.y} should contain at least the following columns:
@@ -36,6 +43,9 @@
 #'   ksfun(.x = mydistData[mydistData$GeneSet == "TestSet",],
 #'         .y = mydistData[mydistData$GeneSet == "SomeRandomName",])
 #'         }
+#'
+#' @author Pascal GP Martin
+#'
 
 ksfun <- function(.x, .y) {
     if (nrow(.x)>0) {
@@ -50,11 +60,17 @@ ksfun <- function(.x, .y) {
 }
 
 
+
 #' Compare 2 sets of distances with a Mann-Whitney U test
 #' (only returns the p-value)
 #'
 #' @param .x A data frame with distances for the gene set of interest.
 #' @param .y A data frame with distances for the control/reference gene set.
+#'
+#' @importFrom dplyr pull
+#' @importFrom stats wilcox.test
+#'
+#' @export
 #'
 #' @section DETAILS:
 #' Both \code{.x} and \code{.y} should contain at least the following columns:
@@ -86,6 +102,7 @@ ksfun <- function(.x, .y) {
 #'   Utest(.x = mydistData[mydistData$GeneSet == "TestSet",],
 #'         .y = mydistData[mydistData$GeneSet == "SomeRandomName",])
 #'         }
+#'
 
 Utest <- function(.x, .y) {
     if (nrow(.x)>0) {
@@ -113,7 +130,9 @@ Utest <- function(.x, .y) {
 #' @importFrom dplyr select mutate
 #' @importFrom rlang .data
 #' @importFrom coin pvalue independence_test
-
+#'
+#' @export
+#'
 #' @section DETAILS:
 #' Both \code{.x} and \code{.y} should contain at least the following columns:
 #' \itemize{
@@ -175,6 +194,8 @@ coinIndep <- function(.x, .y) {
 #' @importFrom rlang .data
 #' @importFrom matrixStats colMedians
 #'
+#' @export
+#'
 #' @return A p-value representing the percentage of times that the median of
 #'         \code{R} random samples drawn from the union of \code{.x} and \code{.y}
 #'         is below the observed median of \code{.x}.
@@ -220,7 +241,7 @@ resampMed <- function(.x, .y, R = 1e4) {
     } else {NA}
 }
 
-#' Apply a test to different genesets using the same refereence/control set
+#' Apply a test to different genesets using the same reference/control set
 #'
 #' @param tbdist A data frame with the following columns:
 #'     \itemize{
@@ -259,7 +280,7 @@ resampMed <- function(.x, .y, R = 1e4) {
 #'                 univ = "RefSet",
 #'                 FUN = ksfun)
 
-pvalByGeneSet <- function(tbdist, univ = Universe, FUN, ...) {
+pvalByGeneSet <- function(tbdist, univ = "Universe", FUN, ...) {
     ud <- tbdist %>%
         dplyr::filter(.data$GeneSet == univ)
     td <- tbdist %>%

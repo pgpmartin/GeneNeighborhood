@@ -2,8 +2,7 @@
 % Please edit documentation in R/distTests.R
 \name{ksfun}
 \alias{ksfun}
-\title{Compare 2 sets of distances with a Kolmogorov-Smirnov test
-(only returns the p-value)}
+\title{Kolmogorov-Smirnov test on genomic distances}
 \usage{
 ksfun(.x, .y)
 }
@@ -49,7 +48,11 @@ large enough gene sets.
   ksfun(.x = mydistData[mydistData$GeneSet == "TestSet",],
         .y = mydistData[mydistData$GeneSet == "SomeRandomName",])
         }
+
 }
 \seealso{
 \code{\link[stats]{ks.test}}
+}
+\author{
+Pascal GP Martin
 }

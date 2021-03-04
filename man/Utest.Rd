@@ -47,6 +47,7 @@ The Mann-Whithney U test is also called the Wilcoxon rank sum test.
   Utest(.x = mydistData[mydistData$GeneSet == "TestSet",],
         .y = mydistData[mydistData$GeneSet == "SomeRandomName",])
         }
+
 }
 \seealso{
 \code{\link[stats]{wilcox.test}}

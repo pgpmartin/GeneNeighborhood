@@ -66,7 +66,7 @@ When  following \code{distest} is \code{TRUE}, the following tests are performed
   statDistanceSide(GeneNeighborhood = GeneNeighbors,
                    glist = randGenes,
                    Side = "Upstream",
-                   nboot = 1e4,
+                   nboot = 1e3,
                    ncores = 3)
 
 }
