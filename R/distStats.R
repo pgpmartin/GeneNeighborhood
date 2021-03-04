@@ -64,6 +64,9 @@
 #' ## Obtain descriptive statistics for these sets of genes:
 #' distStats(distForGeneSets,
 #'           nboot = 1e3, CItype = "perc", ncores = 1)
+#'
+#' @author Pascal GP Martin
+#'
 
 
 distStats <- function(GeneSetDistances,
@@ -202,7 +205,11 @@ distByGrp <- distByGrp %>%
     ) %>%
     dplyr::select(-.data$data, -.data$bootSamples,
                   -.data$bootCI_median, -.data$bootCI_mean) %>%
-    tidyr::unnest()
+    tidyr::unnest(cols = c(.data$n, .data$Min, .data$Q1,
+                           .data$Median, .data$Median_LowerCI,
+                           .data$Median_UpperCI, .data$Mean,
+                           .data$Mean_LowerCI, .data$Mean_UpperCI,
+                           .data$Q3, .data$Max, .data$SD, .data$SEM))
 
 return(distByGrp)
 

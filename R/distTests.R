@@ -262,6 +262,8 @@ resampMed <- function(.x, .y, R = 1e4) {
 #' @importFrom rlang .data
 #' @importFrom tibble tibble
 #'
+#' @export
+#'
 #' @return A tibble with 2 columns: GeneSet and pvalue
 #'
 #' @seealso
@@ -314,7 +316,7 @@ pvalByGeneSet <- function(tbdist, univ = "Universe", FUN, ...) {
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr select rename slice transmute mutate pull
-#'             group_by summarise bind_rows one_of
+#'             group_by summarise bind_rows one_of any_of ends_with
 #' @importFrom reshape2 melt
 #' @importFrom rlang .data !!
 #' @importFrom tibble as_tibble
@@ -412,8 +414,8 @@ if (!(Universe %in%
 
 gs <- GeneSetDistances %>%
     dplyr::select(-.data$Neighbor) %>%
-    dplyr::group_by(.data$Side, .data$Orientation) %>%
-    tidyr::nest(.key = "DistSet")
+#    dplyr::group_by(.data$Side, .data$Orientation) %>%
+    tidyr::nest(DistSet = c(.data$GeneName, .data$Distance, .data$GeneSet))
 
 
 #-----------
@@ -445,21 +447,35 @@ if (MedianResample) {
 }
 
 # gs <- gs %>% dplyr::select(-.data$DistSet)
+# Remove the original data:
 gs <- gs %>%
-      dplyr::select(-.data$DistSet) %>%
-        tidyr::unnest() %>%
-        dplyr::select(-.data$GeneSet1, -.data$GeneSet2) %>%
-        dplyr::arrange(.data$GeneSet, .data$Side, .data$Orientation) %>%
-        dplyr::select(.data$GeneSet, dplyr::everything()) %>%
-        dplyr::rename("KS.pvalue" = "pvalue",
-                      "Wilcox.pvalue" = "pvalue1",
-                      "Indep.pvalue" = "pvalue2")
+  dplyr::select(-.data$DistSet) %>%
+  tidyr::unnest(cols =
+                  dplyr::any_of(c("KS", "Wilcox",
+                                  "Indep", "Median_resample")),
+                names_sep=".") %>%
+  dplyr::rename("GeneSet" = "KS.GeneSet") %>%
+  dplyr::select(-dplyr::ends_with(".GeneSet")) %>%
+  dplyr::arrange(.data$GeneSet, .data$Side, .data$Orientation) %>%
+  dplyr::select(.data$GeneSet, dplyr::everything())
 
-if (MedianResample) {
-    gs <- gs %>%
-            dplyr::select(-.data$GeneSet3) %>%
-            dplyr::rename("Median_resample" = "pvalue3")
-}
+# gs <- gs %>%
+#       dplyr::select(-.data$DistSet) %>%
+#         tidyr::unnest(cols = c(.data$KS, .data$Wilcox,
+#                                .data$Indep, .data$Median_resample),
+#                       names_repair = "universal") %>%
+#         dplyr::select(-.data$GeneSet1, -.data$GeneSet2) %>%
+#         dplyr::arrange(.data$GeneSet, .data$Side, .data$Orientation) %>%
+#         dplyr::select(.data$GeneSet, dplyr::everything()) %>%
+#         dplyr::rename("KS.pvalue" = "pvalue",
+#                       "Wilcox.pvalue" = "pvalue1",
+#                       "Indep.pvalue" = "pvalue2")
+
+# if (MedianResample) {
+#     gs <- gs %>%
+#             dplyr::select(-.data$GeneSet3) %>%
+#             dplyr::rename("Median_resample" = "pvalue3")
+# }
 
 return(gs)
 

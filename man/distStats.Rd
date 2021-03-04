@@ -71,8 +71,12 @@ Using nboot >= 1e4 (the default) is always recommended.
 ## Obtain descriptive statistics for these sets of genes:
 distStats(distForGeneSets,
           nboot = 1e3, CItype = "perc", ncores = 1)
+
 }
 \seealso{
 \code{\link[boot]{boot}},
          \code{\link[boot]{boot.ci}}
+}
+\author{
+Pascal GP Martin
 }

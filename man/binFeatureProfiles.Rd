@@ -48,6 +48,9 @@ Bin coverage profiles given as a matrix or RleList of profiles.
   randGenes <- sample(names(Genegr), 100)
 ## Windows of interests covering the gene bodies + 50bp on each side
   woi <- Genegr[randGenes] +50
+## Remove windows that go beyond chromosome borders
+  woi <- woi[GenomicRanges::width(GenomicRanges::trim(woi)) -
+              GenomicRanges::width(woi) == 0]
 ## Coverage on these windows of interest:
   profs <- profcomp(covr, woi)
 ## Make 10 bins:
