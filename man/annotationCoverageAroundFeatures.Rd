@@ -4,8 +4,14 @@
 \alias{annotationCoverageAroundFeatures}
 \title{Extract stranded annotation profiles at and around a set of features/intervals.}
 \usage{
-annotationCoverageAroundFeatures(annot, features = NULL,
-  sidedist = 2000L, usePercent = FALSE, BinFeatures = TRUE, ...)
+annotationCoverageAroundFeatures(
+  annot,
+  features = NULL,
+  sidedist = 2000L,
+  usePercent = FALSE,
+  BinFeatures = TRUE,
+  ...
+)
 }
 \arguments{
 \item{annot}{A \code{\link{GRanges}} of (stranded) genomic annotations}

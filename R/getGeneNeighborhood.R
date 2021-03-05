@@ -179,6 +179,7 @@ res$CountOvlAnyStrand <- GenomicRanges::countOverlaps(GeneGRanges, ignore.strand
 ##----------------------
 ## Get the index of the genes that have a single overlapping gene:
 WhichSingleOVL <- which(!is.na(res$CountOvlAnyStrand) & res$CountOvlAnyStrand == 1)
+names(WhichSingleOVL) <- NULL
 ## Find all overlaps between all genes:
 AllFOV <- GenomicRanges::findOverlaps(GeneGRanges, ignore.strand = TRUE)
 ## Extract the hits corresponding to single overlaps:

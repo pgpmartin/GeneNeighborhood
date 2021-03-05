@@ -5,8 +5,13 @@
 \title{Extract a region around the TES (=end of the gene) from
     a \code{\link{GRanges}}}
 \usage{
-getTESregion(gr, upstream = 500L, downstream = 501L,
-  limitToTSS = FALSE, trim = FALSE)
+getTESregion(
+  gr,
+  upstream = 500L,
+  downstream = 501L,
+  limitToTSS = FALSE,
+  trim = FALSE
+)
 }
 \arguments{
 \item{gr}{A \code{\link{GRanges}}.}

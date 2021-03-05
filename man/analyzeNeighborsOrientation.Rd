@@ -4,8 +4,13 @@
 \alias{analyzeNeighborsOrientation}
 \title{Analyze the orientation of gene neighbors for a set of pre-defined genes}
 \usage{
-analyzeNeighborsOrientation(GeneList, GeneNeighborhood = NULL,
-  keepOther = TRUE, EnrichTest = TRUE, GeneUniverse = NULL)
+analyzeNeighborsOrientation(
+  GeneList,
+  GeneNeighborhood = NULL,
+  keepOther = TRUE,
+  EnrichTest = TRUE,
+  GeneUniverse = NULL
+)
 }
 \arguments{
 \item{GeneList}{A character vector of focus genes to analyze}

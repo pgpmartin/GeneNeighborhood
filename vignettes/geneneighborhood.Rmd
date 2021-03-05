@@ -145,53 +145,117 @@ Add an example with multiple groups
 
 ## Analyze the proximity of the neighbors
 
-  Whether or not there is a significant enrichment for a given orientation, we may ask if the gene neighbors are located at a specific distance from the focus genes, i.e. closer or farther than expected.  
+  Whether or not there is a significant enrichment for a given orientation, we may ask if the gene neighbors are located at a specific distance from the focus genes, i.e. closer or farther than expected by chance.  
 
-### Analysis of a random set of genes:  
-  
-Analyzing the distances of the upstream **or** downstream genes can be done with:  
-**Note:** *To reduce computation time, we use only 2000 boostrap samples to compute the confidence intervals of the mean and median but a value at least equal to the default 1e4 should be preferred. We also illustrate the use of the `ncores` argument for parallel computing of boostrap samples (not available on Windows)*
-```{r randUpstreamDist, results = "hide"}
-randUpstreamDist <- statDistanceSide(GeneNeighborhood = GeneNeighbors,
-                                     glist = randGenes,
-                                     Side = "Upstream",
-                                     nboot = 2e3,
-                                     ncores = 2)
+### Extracting the distances to the neighbor genes:  
+
+We can extract the distances to both the upstream and downstream genes with:  
+```{r extract_randDist, results = "hide"}
+randDist <- dist2Neighbors(GeneNeighborhood = GeneNeighbors,
+                           geneset = randGenes,
+                           genesetName = "RandomGenes")
 ```
-  
-Which gives the following (simplified) table:
-```{r randUpstreamDist kable, echo = FALSE}
-randUpstreamDist$stats  %>% 
-  dplyr::select(GeneGroup, SideClass, n, Median, Mean, SD, KS.pvalue:Independ.pvalue) %>%
-  dplyr::mutate(KS.pvalue = signif(KS.pvalue, 2),
-                Wilcox.pvalue = signif(Wilcox.pvalue, 2),
-                Independ.pvalue = signif(Independ.pvalue, 2)) %>%
-  knitr::kable(digits = c(0,0,0,1,1,1,300,300,300), 
-               format = "markdown",
-               caption="Upstream distances of random genes")
-```
-  
-  
-  However, the `analyzeNeighborsDistance` function provides a wrapper to perform the analysis directly on **both** upstream and downstream genes: 
-```{r randDist, results = "hide"}
-randDist <- analyzeNeighborsDistance(GeneList = randGenes,
-                                     GeneNeighborhood = GeneNeighbors,
-                                     nboot = 2e3,
-                                     ncores = 2)
+The function automatically filters out genes with undefined upstream or downstream genes (e.g. when a gene is located at a chromosome border).  
+
+The resulting table looks like this (top 6 rows only):
+```{r extract_randDist kable, echo = FALSE}
+head(randDist, n = 6) %>%
+  knitr::kable(format = "markdown",
+               caption="Distances to gene neighbors")
 ```
 
-We obtain the following (simplified) table:
-```{r randDist kable, echo = FALSE}
-randDist$stats  %>% 
-  dplyr::select(GeneGroup:n, Median, Mean, SD, KS.pvalue:Independ.pvalue) %>%
-  dplyr::mutate(KS.pvalue = signif(KS.pvalue, 2),
-                Wilcox.pvalue = signif(Wilcox.pvalue, 2),
-                Independ.pvalue = signif(Independ.pvalue, 2)) %>%
-  knitr::kable(digits = c(0,0,0,0,1,1,1,300,300,300), 
-               format = "markdown",
-               caption="Upstream distances")
+The function also be used with a named list containing different gene sets:
+```{r extract_SeveralGeneSetDist, results = "hide"}
+myGSdist <- dist2Neighbors(GeneNeighborhood = GeneNeighbors,
+                           geneset = list("RandomGenes" = randGenes, 
+                                          "AllGenes" = names(gn)))
 ```
-   
+
+
+For a single gene set and a single side (upstream **or** downstream) the distances can be extracted with the underlying function:
+```{r randDist_Upstream, results = "hide"}
+randDist_Upstream <- getDistSide(GeneNeighbors, randGenes, "Upstream") 
+```
+which gives the following table (top 6 rows):
+```{r randDist_Upstream kable, echo = FALSE}
+head(randDist_Upstream, n = 6) %>%
+  knitr::kable(format = "markdown",
+               caption="Distances to upstream gene neighbors")
+```
+
+
+### Create a new gene set with close upstream neighbors
+
+To illustrate how a specific proximity pattern can be detected and represented, we will use the intergenic distances that we can now extract to define a subset of genes that are enriched for genes with short upstream intergenic distances, whatever the orientation (same or opposite strand).
+
+Let's extract all upstream distances:
+```{r allUpstrimDist, results = "hide"}
+allUpstrimDist <- getDistSide(GeneNeighbors, names(gn), "Upstream")
+```
+ 
+
+Then we define a probability of selecting a gene that is inversely proportional to its upstream distance:
+```{r distance probs}
+#We replace extreme values by the 99th percentile
+updistQ <- pmin(allUpstrimDist$Distance,
+                quantile(allUpstrimDist$Distance,0.99)) 
+updistQ[updistQ<1e3] <- floor(updistQ[updistQ<1e3]/2) #we give more weight to distances below 1Kb
+updistQ[updistQ>1e3] <- pmax(updistQ[updistQ>1e3]*1.5, max(updistQ)) #and less weight to distances above 1Kb
+probs <- (max(updistQ) - updistQ) / 
+         sum(max(updistQ) - updistQ)
+```
+  Then we select 800 genes using these probabilities:
+```{r lessRandGenes}
+set.seed(123)
+closeUpstreamNeighbors <- sample(allUpstrimDist$GeneName, 
+                                 800, 
+                                 prob=probs)
+```
+
+We now have 2 sets of genes:
+
+1. A set of 400 genes that were randomly selected (`randGenes`)  
+2. A set of 800 genes that are enriched for close upstream neighbors (`closeUpstreamNeighbors`)
+
+Let's assemble these sets together with the "universe" (i.e. all genes studied) in a list:
+```{r}
+MyGeneSets <- list("RandomGenes" = randGenes,
+                   "CloseUpstreamNeighbors" = closeUpstreamNeighbors,
+                   "AllGenes" = GeneNeighbors$GeneName)
+```
+and extract the distances to the gene neighbors for all these genes:
+```{r Dist2GeneSets, results = "hide"}
+Dist2GeneSets <- dist2Neighbors(GeneNeighbors, MyGeneSets)
+```
+
+
+### Obtain descriptive statistics on the intergenic distances
+
+We can obtain descriptive statistics for each side (upstream/downstream), each orientation (same or opposite strand) and each gene set with the `distStats` function:
+```{r}
+MyDistStats <- distStats(Dist2GeneSets, 
+                         confLevel = 0.95,
+                         nboot = 500, 
+                         CItype="perc",
+                         ncores = 2)
+```
+The function also calculates bootstrap confidence intervals for the mean and median using the `boot` package.  
+**Note:** *To reduce computation time, we use only 500 boostrap samples to compute the confidence intervals of the mean and median but a value at least equal to the default 1e4 should be preferred. The function also supports parallel computing (not available on Windows) via the `ncores` argument*
+
+We obtain the following table of statistics:
+```{r MyDistStats kable, echo = FALSE}
+MyDistStats  %>% 
+  knitr::kable(digits = 0,
+               format = "markdown",
+               caption="Descriptive statistics on intergenic distances")
+```
+
+
+
+### Test for differences in intergenic distances
+
+Evaluating if a set of genes has intergenic distances with their neighbors that are shorter or longer than expected by chance can be formulated in different ways.
+
 Here too, the distances between the genes and their neighbors can be compared between those for the selected set of genes (`GeneList`) and thos for the entire universe (which defaults to all genes provided in the `GeneNeighborhood` argument but can be adjusted with the `GeneUniverse` argument). We implement 3 statistical tests to compare the results obtained for the gene set *vs* those for the universe:  
 
   - The Kolmogorov-Smirnov test evaluates if there is a difference in the distribution of distances between the gene set and the universe. While the Kolmogorov-Smirnov test is designed for continuous variables, it is known to produce conservative p-values for discrete distributions when the sample size is large enough.  
@@ -205,93 +269,192 @@ Here too, the distances between the genes and their neighbors can be compared be
 <!-- TODO. Add refs for the coin package. See citation-->
   
    All tests are performed in their bilateral version (i.e. with a two-sided alternative hypothesis)
-   
-   
-### Extracting intergenic distances:  
 
-The `analyzeNeighborsDistance` function can also be used to extract intergenic distances for all genes (overlapping upstream or downstream genes are removed automatically here). To do this, we set the `GeneList` argument to be all genes and set `DistriTest=FALSE` (*We also change the type of boostrap confidence interval to avoid an error linked to the low number of boostrap samples computed in this vignette*):
-```{r alldist, results = "hide"}
-alldist <- analyzeNeighborsDistance(GeneList = names(gn),
-                                    GeneNeighborhood = GeneNeighbors,
-                                    DistriTest = FALSE,
-                                    nboot = 2e3,
-                                    CItype = "perc",
-                                    ncores = 2)
+```{r test MyDistTests, result = "hide"}
+MyDistTests <- distTests(Dist2GeneSets,
+                         Universe = "AllGenes",
+                         MedianResample = TRUE,
+                         R = 1e3)
 ```
-  
-  
-### Analyze a set of genes enriched for close upstream neighbors:
-  To illustrate how a specific proximity pattern can be detected and represented, we use these intergenic distances to select a set of genes with more frequent short upstream distances than expected by chance, whatever the orientation (same or opposite strand).   
-  
-  First, we extract upstream distances:
-```{r updist}
-updist <- alldist$distances$Distance[alldist$distances$Side=="Upstream"]
-names(updist) <- alldist$distances$GeneName[alldist$distances$Side=="Upstream"]
-```
-  Then we define a probability of selecting the gene that is inversely proportional to its upstream distance:
-```{r probs}
-updistQ <- pmin(updist, quantile(updist,0.99)) #We replace extreme values by the 99th percentile
-probs <- (max(updistQ) - updistQ) / 
-         sum(max(updistQ) - updistQ)
-```
-  Then we select 800 genes using these probabilities:
-```{r lessRandGenes}
-set.seed(123)
-closeUpstreamNeighbors <- sample(names(updist), 800, prob=probs)
-```
-  And finally we analyze the intergenic distances with these genes' neighbors:
-```{r lessRandDist, results = "hide"}
-closeUpstreamDist <- analyzeNeighborsDistance(GeneList = closeUpstreamNeighbors,
-                                              GeneNeighborhood = GeneNeighbors,
-                                              nboot = 2e3,
-                                              ncores = 2)
-```
-   
-We obtain the following (simplified) table:
-```{r lessRandDist kable, echo = FALSE}
-closeUpstreamDist$stats  %>% 
-  dplyr::select(GeneGroup:n, Median, Mean, SD, KS.pvalue:Independ.pvalue) %>%
+
+Table:
+```{r MyDistTests kable, echo = FALSE}
+MyDistTests  %>% 
   dplyr::mutate(KS.pvalue = signif(KS.pvalue, 2),
                 Wilcox.pvalue = signif(Wilcox.pvalue, 2),
-                Independ.pvalue = signif(Independ.pvalue, 2)) %>%
-  knitr::kable(digits = c(1,1,1,1,2,2,2,300,300,300), 
+                Indep.pvalue = signif(Indep.pvalue, 2),
+                Median_resample.pvalue = signif(Median_resample.pvalue, 2)) %>%
+  knitr::kable(digits = c(0,0,0,300,300,300,300), 
                format = "markdown",
-               caption="Upstream distances of close upstream neighbors")
+               caption="Test statistics on intergenic distances")
 ```
-   
-   
+
+
+
 ### Plotting the results:
-Before plotting, we need to assemble the distances for different groups of genes in a single data frame:
-```{r mydist dataset}
-mydist <- rbind.data.frame(alldist$distances,
-                           randDist$distances,
-                           closeUpstreamDist$distances)
-mydist$GeneSet <- rep(c("All Genes", "Random Genes", "Close Upstream"),
-                      times = c(nrow(alldist$distances), 
-                                nrow(randDist$distances), 
-                                nrow(closeUpstreamDist$distances)))
-```
-   
-   
-Now, we can plot the distribution of intergenic distances for these sets of genes:
+
+We can plot the distribution of intergenic distances for the different sets of genes:
 ```{r plotDistanceDistrib, message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7}
-plotDistanceDistrib(mydist)
+plotDistanceDistrib(Dist2GeneSets)
 ```
 
 
 Or using violin plots:
 ```{r plotDistanceDistribViolin, message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7}
-plotDistanceDistrib(mydist,
+plotDistanceDistrib(Dist2GeneSets,
                     type = "violin")
 ```
 
-When relatively few genes are analyzed, it is worth looking at individual points. They can be plotted along with a boxplot, under the density plots, using:
+When relatively few genes are analyzed, it is worth looking at individual points. They can be plotted, along with a boxplot, under the density plots, using:
 ```{r plotDistanceDistribJitter, message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7}
-plotDistanceDistrib(mydist,
+plotDistanceDistrib(Dist2GeneSets,
                     type = "jitterbox")
 ```
 
 
 ## Metagene profiles
+
+Another way to study the neighborhood of a set of genes is to produce an average profile representing the coverage of gene annotations in regions surrounding the borders of genes in this set.  
+Such a representation provides information on both the orientation and the distance of the neighbors. It also allows to compare different groups of genes.  
+
+The steps to obtain these profiles are:  
+
+  - Calculate the strand-specific coverage of gene annotations (possibly after reducing the gene ranges, see `usePercent` argument below)  
+  - For each gene, extract the coverage on both strands in windows covering the gene body and regions on each side of the gene body (region length defined by the `sidedist` argument)  
+  - Average the signal on the gene body in a fixed number of bins in order to align the signal from genes of different lengths (number of bins defined by the `nbins` argument).  
+  - Combine and reverse the signals appropriately in order to get aligned signal at and around each gene on the *Sense strand* (strand on which the gene is annotated) and *Antisense strand* (strand opposite to the gene's annotation).  
+
+When gene annotations overlap on the same strand, we can decide to keep this information (i.e. we can get coverage values >1) or to only focus on presence/absence of annotations (i.e. strand-specific coverage is 0 or 1) using the argument `usePercent = TRUE` (in this case, the average of 0/1 values for aligned signals is a percentage of bases covered with annotations).  
+
+To extract +/-2Kb of signal on each side of all genes:
+```{r}
+Prof <- annotationCoverageAroundFeatures(gn,
+                                         sidedist = 2000,
+                                         usePercent = TRUE,
+                                         nbins=10)
+```
+
+```{r, include= FALSE, eval=FALSE}
+#Prof may be pre-compiled to avoid long computation?
+# For alternative option, see 
+#https://community.rstudio.com/t/precompiling-vignette-with-devtools/1583/2
+#https://community.rstudio.com/t/vignettes-that-require-locally-stored-data/2392/2
+
+Prof <- readRDS("Prof.rds")
+```
+
+The `Prof` object is a list with elements:  
+```{r, echo=FALSE}
+cat(paste(names(Prof), collapse="\n"))
+```
+
+Each element is an `RleList` containing the strand-specific coverage of annotations on the gene body (*Feature*), in the region (-2kb to the start of the gene) located upstream of the genes (*UpstreamBorder*) and in the region (end of the gene to +2kb) located downstream of the genes (*DownstreamBorder*).   
+  The *Sense* strand is the strand on which the focus gene (*Feature*) is annotated and the *Antisense* strand is the opposite strand.   
+
+  These elements are now assembled into gene-level vectors containing the upstream region, gene body and downstream region:
+```{r}
+Prof <- assembleProfiles(Prof)
+```
+  
+
+Now we define groups of genes on which we want to calculate an average profile and its associated confidence interval:
+```{r}
+GeneGroups <- list("AllGenes" = names(gn),
+                   "RandomGenes" = randGenes,
+                   "CloseNeighbors" = closeUpstreamNeighbors)
+```
+
+For each group, we then calculate the average profile and 95% confidence interval:
+
+```{r}
+avgProf <- list()
+for (i in 1:length(GeneGroups)) {
+  avgProf[[i]] <- list()
+  avgProf[[i]]$sense <- getAvgProfileWithCI(Prof$Profiles_Sense,
+                                            selFeatures = GeneGroups[[i]],
+                                            pos = c(-2000:0, 1:10, 0:2000))
+  avgProf[[i]]$antisense <- getAvgProfileWithCI(Prof$Profiles_Antisense,
+                                                selFeatures = GeneGroups[[i]],
+                                                pos = c(-2000:0, 1:10, 0:2000))
+}
+names(avgProf) <- names(GeneGroups)
+
+```
+
+Before plotting, we need to assemble these profiles in a single table. We must provide the x-coordinates for these "metagene" profiles. The x-coordinates should be in [0,5] with the upstream region covering [0,2[, the TSS having x-coordinate 2, the gene body covering ]2,3[, the TSS having coordinate 3 and the downstream region covering ]3,5].
+```{r}
+xcoord = c(seq(0, 2, length.out = 2001),
+           seq(2, 3, length.out = 12)[2:11],
+           seq(3, 5, length.out = 2001))
+```
+
+<!-- TODO. Add a column or attributes in the profiles indicating where the upstream, gene body and downstream regions are located. In this way the user does not have to define x-coord-->
+
+And we assemble the metagene profiles in a data.frame with:
+```{r}
+avgProf_df <- reshape2::melt(avgProf,
+                             measure.vars = "Profile", value.name = "Profile") %>%
+                  dplyr::rename("Strand" = "L2",
+                                "GeneSet" = "L1") %>%
+                  dplyr::mutate(Xcoord=rep(xcoord, 2*length(GeneGroups)))
+```
+
+
+Now these profiles can be plotted:
+```{r plotMetageneAnnotProf, message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7}
+plotMetageneAnnotProfile(avgProf_df, usePercent = TRUE)
+```
+
+By default, the plot goes all the way up to 100% coverage, which is the value on the gene body for the sense strand. To change this behavior, we can use:
+
+```{r plotMetageneAnnotProfylim, message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7}
+plotMetageneAnnotProfile(avgProf_df, usePercent = TRUE) +
+    ggplot2::coord_cartesian(ylim=c(0,50))
+```
+
+
+
+## Distance to single-point features
+
+One limitation of these average profiles is that all the length of the neighborhing genes/features is taken into account to produce the profiles. For example, we see the enrichment of close upstream neighbors in the average profiles ("CloseNeighbors" group), but we cannot directly answer a question such as: *"What is the fraction of genes from this (and other) set that have a neighboring TES, on the same strand, at less than 600bp"*.  
+
+In order to do this, we first extract the TES, which are *"single-point features"* located at the (3') end of the genes.
+```{r}
+tes <- getTES(gn)
+```
+
+If we were interested in TSS (transcription start site), we could get their coordinates using:
+```{r, eval=FALSE}
+tss <- GenomicRanges::promoters(gn, upstream = 0, downstream = 1)
+```
+
+Then we extract the coverage of TES around the genes (here +/- 1kb) using (we only use 3 bins for each gene as we are not interested to look at gene bodies here) :
+```{r}
+tescov <- annotationCoverageAroundFeatures(annot = tes, 
+                                           features = gn, 
+                                           sidedist = 2000, 
+                                           usePercent = TRUE,
+                                           nbins = 3)
+```
+
+Now, in order to obtain cumulative presence of TES as we move away from the border of our genes of interest, we first extend the "presence" (coverage=1) value of each TES to any distance larger than the location of each TES. For example, if a TES is found at 100bp upstream of a gene, then we count it as "present" (coverage =1) for any distance greater or equal to 100bp.
+```{r}
+extTEScov <- extendPointPresence(tescov, sidedist = 2000) 
+```
+
+For different groups of genes we now obtain the cumulative percentage of genes that have a TES at less than a given distance with:
+```{r}
+cumulTES <- getCumulPercentProfiles(extTEScov,
+                                    genesets = GeneGroups)
+```
+
+and plot the results:
+```{r plotCumulPercentProfile, message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7}
+plotCumulPercentProfile(cumulTES)
+```
+
+
+
+## Case studies
 
 

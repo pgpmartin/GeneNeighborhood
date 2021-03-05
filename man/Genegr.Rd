@@ -4,7 +4,9 @@
 \name{Genegr}
 \alias{Genegr}
 \title{A GRanges with 676 random genes on a single chromosome}
-\format{A \code{\link{GRanges}} (from the \code{GenomicRanges} package).}
+\format{
+A \code{\link{GRanges}} (from the \code{GenomicRanges} package).
+}
 \usage{
 Genegr
 }

@@ -45,46 +45,24 @@
 #'   set.seed(123)
 #'   randGenes <- sample(names(Genegr), 100)
 #'
-#' ## Extract intergenic distances and stats for these genes:
-#'   randDist <- analyzeNeighborsDistance(GeneList = randGenes,
-#'                                        GeneNeighborhood = GeneNeighbors,
-#'                                        nboot=1e3, CItype="perc",
-#'                                        ncores = 2)
-#'
-#' ## Extract the intergenic distances for all non-overlapping genes:
-#'   alldist <- analyzeNeighborsDistance(GeneList = names(Genegr),
-#'                                       GeneNeighborhood = GeneNeighbors,
-#'                                       DistriTest = FALSE,
-#'                                       nboot=1e3, CItype="perc",
-#'                                       ncores = 2)
-#'
 #' ## Select a set of genes with a short upstream distances:
-#'   ### get the upstream distances:
-#'     updist <- alldist$distances$Distance[
-#'                   alldist$distances$Side=="Upstream"]
-#'     names(updist) <- alldist$distances$GeneName[
-#'                          alldist$distances$Side=="Upstream"]
+#'   ### Extract upstream distances for all genes:
+#'     updist <- getDistSide(GeneNeighbors,
+#'                           names(Genegr),
+#'                           Side = "Upstream")
 #'   ### Define sampling probabilities inversely proportional to the distance:
-#'     probs <- (max(updist) - updist) / sum(max(updist) - updist)
-#'   ### Sample 100 genes with these probabilities:
+#'     probs <- (max(updist$Distance) - updist$Distance) /
+#'                  sum(max(updist$Distance) - updist$Distance)
+#'   ### Sample 100 genes using these probabilities:
 #'     set.seed(1234)
-#'     lessRandGenes <- sample(names(updist), 100, prob=probs)
+#'     closeUpstream <- sample(updist$GeneName, 100, prob=probs)
 #'
-#' ## Extract intergenic distances and stats for this new set of genes:
-#'   lessRandDist <- analyzeNeighborsDistance(GeneList = lessRandGenes,
-#'                                            GeneNeighborhood = GeneNeighbors,
-#'                                            nboot=1e3, CItype="perc",
-#'                                            ncores = 2)
+#' ## Extract all upstream/downstream distances for different gene sets:
+#'   mydist <- dist2Neighbors(GeneNeighbors,
+#'                            list("All Genes" = names(Genegr),
+#'                                 "Random Genes" = randGenes,
+#'                                 "Close Upstream" = closeUpstream))
 #'
-#' ## Assemble the data for all genes, random genes and "less random" genes
-#' ## in a single data frame:
-#'   mydist <- rbind.data.frame(alldist$distances,
-#'                              randDist$distances,
-#'                              lessRandDist$distances)
-#'   mydist$GeneSet <- rep(c("All Genes", "Random Genes", "Less Random genes"),
-#'                         times = c(nrow(alldist$distances),
-#'                                   nrow(randDist$distances),
-#'                                   nrow(lessRandDist$distances)))
 #' ## Finally, plot the distribution of distances (density plot):
 #'   plotDistanceDistrib(mydist)
 #' ## Using violin plots and specific colors and labels
@@ -92,10 +70,10 @@
 #'                       type = "violin",
 #'                       genesetcols = c("All Genes" = "grey",
 #'                                       "Random Genes" = "lightblue",
-#'                                       "Less Random genes" = "pink"),
+#'                                       "Close Upstream" = "pink"),
 #'                       newlabs = c("All Genes" = "ALL",
 #'                                   "Random Genes" = "Random",
-#'                                   "Less Random genes" = "Close Upstream"))
+#'                                   "Close Upstream" = "Close"))
 #'  ## Adding jitter points and a boxplot under the density plot
 #'   plotDistanceDistrib(mydist, type = "jitterbox")
 #'
