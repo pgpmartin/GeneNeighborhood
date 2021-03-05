@@ -67,7 +67,7 @@ GeneNeighbors <- getGeneNeighborhood(Genegr)
   
 We define a random set of 100 genes:
 ```{r define random genes}
-set.seed(123)
+set.seed(1234)
 randGenes <- sample(names(Genegr), 100)
 ```
   
@@ -107,75 +107,20 @@ plotNeighborsOrientation(NOS)
 
 ### Analyze the proximity of the genes' neighbors
 
-We can analyze specifically the distances to the upstream genes with (here using 1000 bootstrap replicates to estimate the 95% confidence intervals of the mean and median):
-```{r randUpstreamDist, results = "hide", warning=FALSE}
-randUpstreamDist <- statDistanceSide(GeneNeighborhood = GeneNeighbors,
-                                     glist = randGenes,
-                                     Side = "Upstream",
-                                     nboot = 1e3)
-```
-
-Which gives the following (simplified) table:
-```{r randUpstreamDist kable, echo = FALSE}
-randUpstreamDist$stats  %>% 
-  dplyr::select(GeneGroup, SideClass, n, Median, Mean, SD, KS.pvalue:Independ.pvalue) %>%
-  dplyr::mutate(KS.pvalue = signif(KS.pvalue, 2),
-                Wilcox.pvalue = signif(Wilcox.pvalue, 2),
-                Independ.pvalue = signif(Independ.pvalue, 2)) %>%
-  knitr::kable(digits = c(1,1,1,2,2,2,300,300,300), 
-               format = "markdown",
-               caption="Upstream distances")
-```
-  
-  
-Or we directly analyze the distances to both upstream and downstream genes:
-```{r randDist, results = "hide", warning=FALSE}
-randDist <- analyzeNeighborsDistance(GeneList = randGenes,
-                                     GeneNeighborhood = GeneNeighbors,
-                                     nboot = 1e3)
-```
-
-Which gives the following (simplified) table:
-```{r randDist kable, echo = FALSE}
-randDist$stats  %>% 
-  dplyr::select(GeneGroup:n, Median, Mean, SD, KS.pvalue:Independ.pvalue) %>%
-  dplyr::mutate(KS.pvalue = signif(KS.pvalue, 2),
-                Wilcox.pvalue = signif(Wilcox.pvalue, 2),
-                Independ.pvalue = signif(Independ.pvalue, 2)) %>%
-  knitr::kable(digits = c(1,1,1,1,2,2,2,300,300,300), 
-               format = "markdown",
-               caption="Upstream distances")
-```
-   
-
-The `alldist$stats` table also contains 95% bootstrap confidence intervals for the mean and median of the `GeneList` set:
-```{r randDist CI values kable, echo = FALSE}
-randDist$stats  %>% 
-    dplyr::filter(GeneGroup == "GeneList") %>%
-    dplyr::select(GeneGroup:n, 
-                  Median_lowerCI, Median, Median_upperCI, 
-                  Mean_lowerCI, Mean, Mean_upperCI) %>%
-  knitr::kable(digits = c(rep(1,4), rep(2,6)), 
-               format = "markdown",
-               caption="Bootstrap CI")
-```
-
-   
-The `analyzeNeighborsDistance` function can also be used to extract intergenic distances for all genes (except those with overlapping genes):
+For a set of genes (here all genes), we can extract the distances to the upstream/downstream gene neighbors by:
 ```{r alldist, results = "hide", warning=FALSE}
-alldist <- analyzeNeighborsDistance(GeneList = names(Genegr),
-                                    GeneNeighborhood = GeneNeighbors,
-                                    DistriTest = FALSE,
-                                    nboot = 1e3)
+alldist <- dist2Neighbors(GeneNeighborhood = GeneNeighbors,
+                          geneset = GeneNeighbors$GeneName,
+                          genesetName = "AllGenes")
 ```
-   
-   
-We can use these distances to preferentially select genes with a short upstream distance.   
-First, we extract upstream distances:
-```{r updist}
-updist <- alldist$distances$Distance[alldist$distances$Side=="Upstream"]
-names(updist) <- alldist$distances$GeneName[alldist$distances$Side=="Upstream"]
+
+We can use these distances to select genes with short upstream distances.  
+First we create a vector of upstream distances:
+```{r updist, warning=FALSE}
+updist <- alldist$Distance[alldist$Side == "Upstream"]
+names(updist) <- alldist$GeneName[alldist$Side == "Upstream"]
 ```
+
 Then we define a probability of selecting the gene that is inversely proportional to its upstream distance:
 ```{r probs}
 probs <- (max(updist) - updist) / sum(max(updist) - updist)
@@ -183,42 +128,72 @@ probs <- (max(updist) - updist) / sum(max(updist) - updist)
 Then select 100 genes using these probabilities:
 ```{r lessRandGenes}
 set.seed(1234)
-lessRandGenes <- sample(names(updist), 100, prob=probs)
-```
-And finally analyze the intergenic distances with these genes' neighbors:
-```{r lessRandDist, results = "hide"}
-lessRandDist <- analyzeNeighborsDistance(GeneList = lessRandGenes,
-                                         GeneNeighborhood = GeneNeighbors)
+lessRandGenes <- sample(names(updist), 100, prob = probs)
 ```
 
-We obtain the following (simplified) table:
-```{r lessRandDist kable, echo = FALSE}
-lessRandDist$stats  %>% 
-  dplyr::select(GeneGroup:n, Median, Mean, SD, KS.pvalue:Independ.pvalue) %>%
+
+We now have:  
+
+  - A set of 100 random genes (`randGenes`)  
+  - A set of 100 genes that tend to have short upstream intergenic distances (`lessRandGenes`)  
+  - A "gene universe" (all genes that are analyzed and have defined neighbors)  
+
+We assemble these in a list:
+```{r}
+MyGeneSets <- list("RandomGenes" = randGenes,
+                   "LessRandomGenes" = lessRandGenes,
+                   "AllGenes" = GeneNeighbors$GeneName)
+```
+
+
+For each gene in each gene set, we extract the distances to their neighbors:
+```{r Dist2GeneSets, results = "hide"}
+Dist2GeneSets <- dist2Neighbors(GeneNeighbors, MyGeneSets)
+```
+
+Now we can obtain descriptive statistics on these distances:
+```{r}
+MyDistStats <- distStats(Dist2GeneSets, 
+                         confLevel = 0.95,
+                         nboot = 100, 
+                         CItype="perc",
+                         ncores = 2)
+```
+The function also calculates bootstrap confidence intervals for the mean and median using the `boot` package.  
+**Note:** *To reduce computation time, we use only 100 boostrap samples to compute the confidence intervals of the mean and median but a value at least equal to the default 1e4 should be preferred. The function also supports parallel computing (not available on Windows) via the `ncores` argument*
+
+We obtain the following table of statistics:
+```{r MyDistStats kable, echo = FALSE}
+MyDistStats  %>% 
+  knitr::kable(digits = 0,
+               format = "markdown",
+               caption="Descriptive statistics on intergenic distances")
+```
+
+We can perform statistical tests to evaluate if the distances observed in a gene set are significantly different from the distances observed in the universe. Because there are different ways to formulate this question, the `distTests` function provides the p-values for different tests (see the vignette for details):
+```{r test MyDistTests, result = "hide"}
+MyDistTests <- distTests(Dist2GeneSets,
+                         Universe = "AllGenes",
+                         MedianResample = TRUE,
+                         R = 1e3)
+```
+
+Table:
+```{r MyDistTests kable, echo = FALSE}
+MyDistTests  %>% 
   dplyr::mutate(KS.pvalue = signif(KS.pvalue, 2),
                 Wilcox.pvalue = signif(Wilcox.pvalue, 2),
-                Independ.pvalue = signif(Independ.pvalue, 2)) %>%
-  knitr::kable(digits = c(1,1,1,1,2,2,2,300,300,300), 
+                Indep.pvalue = signif(Indep.pvalue, 2),
+                Median_resample.pvalue = signif(Median_resample.pvalue, 2)) %>%
+  knitr::kable(digits = c(0,0,0,300,300,300,300), 
                format = "markdown",
-               caption="Upstream distances less random genes")
+               caption="Test statistics on intergenic distances")
 ```
-   
-   
-Before plotting, we need to assemble the distances for different groups of genes in a single data frame:
-```{r mydist dataset}
-mydist <- rbind.data.frame(alldist$distances,
-                           randDist$distances,
-                           lessRandDist$distances)
-mydist$GeneSet <- rep(c("All Genes", "Random Genes", "Less Random genes"),
-                      times = c(nrow(alldist$distances), 
-                                nrow(randDist$distances), 
-                                nrow(lessRandDist$distances)))
-```
-   
-   
+
 Now, we can plot the distribution of intergenic distances for these sets of genes:
 ```{r plotDistanceDistrib, message = FALSE, warning = FALSE}
-plotDistanceDistrib(mydist)
+plotDistanceDistrib(Dist2GeneSets,
+                    type = "jitterbox")
 ```
 
    

@@ -145,9 +145,7 @@ Add an example with multiple groups
 
 ## Analyze the proximity of the neighbors
 
-<!-- TODO. Update this section with new functions getDistSide, dist2Neighbors, testDistances and DistanceStats-->
-
-  Whether or not there is a significant enrichment for a given orientation, we may ask if the gene neighbors are located at a specific distance from the focus genes, i.e. closer or farther than expected.  
+  Whether or not there is a significant enrichment for a given orientation, we may ask if the gene neighbors are located at a specific distance from the focus genes, i.e. closer or farther than expected by chance.  
 
 ### Extracting the distances to the neighbor genes:  
 
