@@ -55,8 +55,12 @@ Extract distances to the upstream and downstream neighbors.
                     "AllGenes" = GeneNeighbors$GeneName)
  distForGeneSets <- dist2Neighbors(GeneNeighbors,
                                    myGeneSets)
+
 }
 \seealso{
 \code{\link{getGeneNeighborhood}}
          \code{\link{getDistSide}}
+}
+\author{
+Pascal GM Martin
 }

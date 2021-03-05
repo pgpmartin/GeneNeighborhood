@@ -103,6 +103,8 @@ ksfun <- function(.x, .y) {
 #'         .y = mydistData[mydistData$GeneSet == "SomeRandomName",])
 #'         }
 #'
+#' @author Pascal GP Martin
+#'
 
 Utest <- function(.x, .y) {
     if (nrow(.x)>0) {
@@ -163,6 +165,9 @@ Utest <- function(.x, .y) {
 #'   coinIndep(.x = mydistData[mydistData$GeneSet == "TestSet",],
 #'             .y = mydistData[mydistData$GeneSet == "SomeRandomName",])
 #'         }
+#'
+#' @author Pascal GP Martin
+#'
 
 coinIndep <- function(.x, .y) {
     stopifnot(nrow(.y)>0)
@@ -226,6 +231,9 @@ coinIndep <- function(.x, .y) {
 #'             .y = mydistData[mydistData$GeneSet == "SomeRandomName",],
 #'             R = 1e3)
 #'         }
+#'
+#' @author Pascal GP Martin
+#'
 
 resampMed <- function(.x, .y, R = 1e4) {
     stopifnot(nrow(.y)>0)
@@ -281,6 +289,9 @@ resampMed <- function(.x, .y, R = 1e4) {
 #'   pvalByGeneSet(tbdist = mydistData,
 #'                 univ = "RefSet",
 #'                 FUN = ksfun)
+#'
+#' @author Pascal GP Martin
+#'
 
 pvalByGeneSet <- function(tbdist, univ = "Universe", FUN, ...) {
     ud <- tbdist %>%
@@ -379,6 +390,9 @@ pvalByGeneSet <- function(tbdist, univ = "Universe", FUN, ...) {
 #'             Universe="AllGenes",
 #'             MedianResample = TRUE,
 #'             R=1e3)
+#'
+#' @author Pascal GP Martin
+#'
 
 
 distTests <- function(GeneSetDistances,
@@ -459,48 +473,12 @@ gs <- gs %>%
   dplyr::arrange(.data$GeneSet, .data$Side, .data$Orientation) %>%
   dplyr::select(.data$GeneSet, dplyr::everything())
 
-# gs <- gs %>%
-#       dplyr::select(-.data$DistSet) %>%
-#         tidyr::unnest(cols = c(.data$KS, .data$Wilcox,
-#                                .data$Indep, .data$Median_resample),
-#                       names_repair = "universal") %>%
-#         dplyr::select(-.data$GeneSet1, -.data$GeneSet2) %>%
-#         dplyr::arrange(.data$GeneSet, .data$Side, .data$Orientation) %>%
-#         dplyr::select(.data$GeneSet, dplyr::everything()) %>%
-#         dplyr::rename("KS.pvalue" = "pvalue",
-#                       "Wilcox.pvalue" = "pvalue1",
-#                       "Indep.pvalue" = "pvalue2")
-
-# if (MedianResample) {
-#     gs <- gs %>%
-#             dplyr::select(-.data$GeneSet3) %>%
-#             dplyr::rename("Median_resample" = "pvalue3")
-# }
-
 return(gs)
 
 ## See https://robertamezquita.github.io/post/2017-05-23-using-map-with-generic-functions-like-t-test/
 ## https://stackoverflow.com/questions/35558766/purrr-map-a-t-test-onto-a-split-df
 ## https://community.rstudio.com/t/applying-dunn-test-using-purrr-map/15155
 
-# sets<- GeneSetDistances %>%
-#          dplyr::filter(.data$GeneSet!=Universe)
-#
-# univ <- GeneSetDistances %>%
-#     dplyr::filter(.data$GeneSet==Universe)
-
-# GeneSetDistances %>%
-#     dplyr::group_by(.data$Side, .data$Orientation) %>%
-#     dplyr::mutate(KS.pvalue = ks.test( .data %>%
-#                                            dplyr::filter(GeneSet!=Universe) %>%
-#                                            dplyr::pull(Distance),
-#                                        .data %>%
-#                                            dplyr::filter(GeneSet==Universe) %>%
-#                                            dplyr::pull(Distance),
-#                                        exact = FALSE)$p.value)
-##OK problem here is that we mix all gene sets together.
-## We could probably apply this with map
-## See https://jennybc.github.io/purrr-tutorial/index.html
 
 # replicate(R, sample.int(nrow(x)))
 # https://stats.stackexchange.com/questions/247004/statistical-significance-of-difference-between-distances

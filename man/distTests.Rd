@@ -77,9 +77,13 @@ The following tests are possible:
             Universe="AllGenes",
             MedianResample = TRUE,
             R=1e3)
+
 }
 \seealso{
 \code{\link[stats]{ks.test}},
          \code{\link[stats]{wilcox.test}},
          \code{\link[coin]{independence_test}}
+}
+\author{
+Pascal GP Martin
 }

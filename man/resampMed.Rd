@@ -53,8 +53,12 @@ Both \code{.x} and \code{.y} should contain at least the following columns:
             .y = mydistData[mydistData$GeneSet == "SomeRandomName",],
             R = 1e3)
         }
+
 }
 \seealso{
 \code{\link{replicate}}
 \code{\link[matrixStats]{colMedians}}
+}
+\author{
+Pascal GP Martin
 }

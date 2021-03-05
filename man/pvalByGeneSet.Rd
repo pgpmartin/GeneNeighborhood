@@ -41,8 +41,12 @@ Apply a test to different genesets using the same reference/control set
   pvalByGeneSet(tbdist = mydistData,
                 univ = "RefSet",
                 FUN = ksfun)
+
 }
 \seealso{
 \code{\link{replicate}}
 \code{\link[matrixStats]{colMedians}}
+}
+\author{
+Pascal GP Martin
 }

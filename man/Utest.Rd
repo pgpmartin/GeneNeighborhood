@@ -52,3 +52,6 @@ The Mann-Whithney U test is also called the Wilcoxon rank sum test.
 \seealso{
 \code{\link[stats]{wilcox.test}}
 }
+\author{
+Pascal GP Martin
+}

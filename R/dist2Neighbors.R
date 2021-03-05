@@ -52,6 +52,9 @@
 #'                     "AllGenes" = GeneNeighbors$GeneName)
 #'  distForGeneSets <- dist2Neighbors(GeneNeighbors,
 #'                                    myGeneSets)
+#'
+#' @author Pascal GM Martin
+#'
 
 
 dist2Neighbors <- function(GeneNeighborhood = NULL,

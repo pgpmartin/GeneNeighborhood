@@ -47,7 +47,11 @@ Both \code{.x} and \code{.y} should contain at least the following columns:
   coinIndep(.x = mydistData[mydistData$GeneSet == "TestSet",],
             .y = mydistData[mydistData$GeneSet == "SomeRandomName",])
         }
+
 }
 \seealso{
 \code{\link[coin]{independence_test}}
+}
+\author{
+Pascal GP Martin
 }
