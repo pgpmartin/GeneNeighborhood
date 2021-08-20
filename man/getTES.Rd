@@ -2,18 +2,18 @@
 % Please edit documentation in R/utils.R
 \name{getTES}
 \alias{getTES}
-\title{Extract the TES (=end of the gene) from a \code{\link{GRanges}}}
+\title{Extract the TES (=end of the gene/transcript) from a \code{\link{GRanges}} or \code{\link{GRangesList}}}
 \usage{
 getTES(gr)
 }
 \arguments{
-\item{gr}{A \code{\link{GRanges}}.}
+\item{gr}{Either a \code{\link{GRanges}} or a \code{\link{GRangesList}} object.}
 }
 \value{
-A GRanges of the TES positions
+A GRanges or GRangesList of the TES positions
 }
 \description{
-Extract the TES (=end of the gene) from a \code{\link{GRanges}}
+Extract the TES (=end of the gene/transcript) from a \code{\link{GRanges}} or \code{\link{GRangesList}}
 }
 \details{
 The TES is defined as start(gr) when strand(gr)=="+" and
@@ -25,6 +25,10 @@ The function considers that strand=="*" is equivalent to strand=="+"
   GenomicRanges::promoters(Genegr, upstream = 0, downstream = 1)
 ## Get their TES:
   getTES(Genegr)
+## The function also works on GRangesList:
+mygrglist <- S4Vectors::split(Genegr,
+                              rep(paste0("gene", 1:169), each = 4))
+getTES(mygrglist)
 
 }
 \author{

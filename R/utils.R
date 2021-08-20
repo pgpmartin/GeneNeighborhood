@@ -87,16 +87,18 @@ return(prof)
 }
 
 
-#' @title Extract the TES (=end of the gene) from a \code{\link{GRanges}}
-#' @description Extract the TES (=end of the gene) from a \code{\link{GRanges}}
+#' @title Extract the TES (=end of the gene/transcript) from a \code{\link{GRanges}} or \code{\link{GRangesList}}
+#' @description Extract the TES (=end of the gene/transcript) from a \code{\link{GRanges}} or \code{\link{GRangesList}}
 #'
-#' @param gr A \code{\link{GRanges}}.
+#' @param gr Either a \code{\link{GRanges}} or a \code{\link{GRangesList}} object.
 #'
 #' @importFrom GenomicRanges strand promoters
+#' @importFrom IRanges relist
+#' @importFrom S4Vectors elementMetadata
 #'
 #' @export
 #'
-#' @return A GRanges of the TES positions
+#' @return A GRanges or GRangesList of the TES positions
 #'
 #' @details
 #' The TES is defined as start(gr) when strand(gr)=="+" and
@@ -108,10 +110,22 @@ return(prof)
 #'   GenomicRanges::promoters(Genegr, upstream = 0, downstream = 1)
 #' ## Get their TES:
 #'   getTES(Genegr)
+#' ## The function also works on GRangesList:
+#' mygrglist <- S4Vectors::split(Genegr,
+#'                               rep(paste0("gene", 1:169), each = 4))
+#' getTES(mygrglist)
 #'
 #' @author Pascal GP Martin
 
 getTES <- function(gr) {
+
+## if gr is a GrangesList then unlist it
+GRLIST <- FALSE
+if (is(gr, "GRangesList")) {
+  GRLIST <- TRUE
+  grori <- gr
+  gr <- unlist(gr, use.names = FALSE)
+}
 
 ## Check for undefined strand
 isStar <- as.logical(GenomicRanges::strand(gr)=="*")
@@ -132,6 +146,12 @@ tes <- GenomicRanges::promoters(revgr, upstream=0, downstream=1)
 
 ## Reverse back the strand
 GenomicRanges::strand(tes) <- GenomicRanges::strand(gr)
+
+## if gr was a GrangesList reconvert the results to GRangesList
+if (GRLIST) {
+  tes <- IRanges::relist(tes, grori)
+  S4Vectors::elementMetadata(tes) <- S4Vectors::elementMetadata(grori)
+}
 
 return(tes)
 }
