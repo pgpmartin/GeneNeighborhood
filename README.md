@@ -1,10 +1,11 @@
 
-[![Travis build
-status](https://travis-ci.com/pgpmartin/GeneNeighborhood.svg?branch=master)](https://travis-ci.com/pgpmartin/GeneNeighborhood)
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/pgpmartin/GeneNeighborhood/workflows/R-CMD-check/badge.svg)](https://github.com/pgpmartin/GeneNeighborhood/actions)
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/pgpmartin/GeneNeighborhood?branch=master&svg=true)](https://ci.appveyor.com/project/pgpmartin/GeneNeighborhood)
 [![Coverage
 status](https://codecov.io/gh/pgpmartin/GeneNeighborhood/branch/master/graph/badge.svg)](https://codecov.io/github/pgpmartin/GeneNeighborhood?branch=master)
+<!-- badges: end -->
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -112,19 +113,20 @@ NOS <- analyzeNeighborsOrientation(randGenes,
 #> Universe for downstream gene analysis has 518 genes
 ```
 
-We obtain the following
-table:
+We obtain the following table:
 
-| Side       | Orientation     |  n | Percentage | n\_Universe | Percentage\_Universe | p.value |
-| :--------- | :-------------- | -: | ---------: | ----------: | -------------------: | ------: |
-| Upstream   | OppositeOverlap |  4 |       5.26 |          35 |                 6.77 |  0.7900 |
-| Upstream   | OppositeStrand  | 44 |      57.89 |         236 |                45.65 |  0.0140 |
-| Upstream   | SameOverlap     |  1 |       1.32 |          31 |                 6.00 |  0.9900 |
-| Upstream   | SameStrand      | 27 |      35.53 |         215 |                41.59 |  0.9000 |
-| Downstream | OppositeOverlap |  2 |       2.63 |          16 |                 3.09 |  0.7100 |
-| Downstream | OppositeStrand  | 27 |      35.53 |         248 |                47.88 |  0.9900 |
-| Downstream | SameOverlap     |  3 |       3.95 |          31 |                 5.98 |  0.8600 |
-| Downstream | SameStrand      | 44 |      57.89 |         223 |                43.05 |  0.0036 |
+| Side       | Orientation     |   n | Percentage | n\_Universe | Percentage\_Universe | p.value |
+|:-----------|:----------------|----:|-----------:|------------:|---------------------:|--------:|
+| Upstream   | OppositeOverlap |   4 |       5.26 |          35 |                 6.77 |  0.7900 |
+| Upstream   | OppositeStrand  |  44 |      57.89 |         236 |                45.65 |  0.0140 |
+| Upstream   | SameOverlap     |   1 |       1.32 |          31 |                 6.00 |  0.9900 |
+| Upstream   | SameStrand      |  27 |      35.53 |         215 |                41.59 |  0.9000 |
+| Downstream | OppositeOverlap |   2 |       2.63 |          16 |                 3.09 |  0.7100 |
+| Downstream | OppositeStrand  |  27 |      35.53 |         248 |                47.88 |  0.9900 |
+| Downstream | SameOverlap     |   3 |       3.95 |          31 |                 5.98 |  0.8600 |
+| Downstream | SameStrand      |  44 |      57.89 |         223 |                43.05 |  0.0036 |
+
+100 random genes
 
 We can plot the corresponding percentages using:
 
@@ -177,10 +179,10 @@ lessRandGenes <- sample(names(updist), 100, prob = probs)
 
 We now have:
 
-  - A set of 100 random genes (`randGenes`)  
-  - A set of 100 genes that tend to have short upstream intergenic
+-   A set of 100 random genes (`randGenes`)  
+-   A set of 100 genes that tend to have short upstream intergenic
     distances (`lessRandGenes`)  
-  - A “gene universe” (all genes that are analyzed and have defined
+-   A “gene universe” (all genes that are analyzed and have defined
     neighbors)
 
 We assemble these in a list:
@@ -241,23 +243,24 @@ at least equal to the default 1e4 should be preferred. The function also
 supports parallel computing (not available on Windows) via the `ncores`
 argument*
 
-We obtain the following table of
-statistics:
+We obtain the following table of statistics:
 
-| Orientation    | Side       | GeneSet         |   n | Min | Q1 | Median | Median\_LowerCI | Median\_UpperCI | Mean | Mean\_LowerCI | Mean\_UpperCI | Q3 | Max | SD | SEM |
-| :------------- | :--------- | :-------------- | --: | --: | -: | -----: | --------------: | --------------: | ---: | ------------: | ------------: | -: | --: | -: | --: |
-| OppositeStrand | Upstream   | RandomGenes     |  44 |   0 |  2 |     10 |               5 |              15 |   14 |            10 |            19 | 19 |  63 | 15 |   2 |
-| SameStrand     | Upstream   | RandomGenes     |  27 |   0 |  4 |     13 |              11 |              19 |   18 |            11 |            23 | 20 |  71 | 19 |   4 |
-| SameStrand     | Downstream | RandomGenes     |  44 |   0 |  5 |     12 |              10 |              19 |   14 |            11 |            18 | 23 |  35 | 10 |   2 |
-| OppositeStrand | Downstream | RandomGenes     |  27 |   0 |  1 |      7 |               1 |              10 |   14 |             6 |            20 | 26 |  57 | 17 |   3 |
-| SameStrand     | Upstream   | LessRandomGenes |  50 |   0 |  2 |      5 |               3 |              10 |    9 |             5 |            11 | 12 |  46 |  9 |   1 |
-| OppositeStrand | Upstream   | LessRandomGenes |  50 |   0 |  1 |      9 |               4 |              11 |   10 |             7 |            12 | 17 |  29 |  9 |   1 |
-| OppositeStrand | Downstream | LessRandomGenes |  39 |   0 |  2 |      8 |               4 |              10 |   14 |             9 |            20 | 16 |  63 | 18 |   3 |
-| SameStrand     | Downstream | LessRandomGenes |  50 |   0 |  7 |     12 |               9 |              16 |   16 |            13 |            19 | 24 |  55 | 13 |   2 |
-| OppositeStrand | Upstream   | AllGenes        | 236 |   0 |  3 |     10 |               9 |              12 |   13 |            12 |            15 | 19 |  63 | 12 |   1 |
-| SameStrand     | Upstream   | AllGenes        | 215 |   0 |  5 |     11 |              10 |              12 |   14 |            13 |            16 | 20 |  80 | 14 |   1 |
-| OppositeStrand | Downstream | AllGenes        | 248 |   0 |  3 |     10 |               8 |              11 |   15 |            13 |            17 | 20 |  71 | 16 |   1 |
-| SameStrand     | Downstream | AllGenes        | 223 |   0 |  5 |     12 |              10 |              13 |   15 |            13 |            17 | 21 |  80 | 14 |   1 |
+| Orientation    | Side       | GeneSet         |   n | Min |  Q1 | Median | Median\_LowerCI | Median\_UpperCI | Mean | Mean\_LowerCI | Mean\_UpperCI |  Q3 | Max |  SD | SEM |
+|:---------------|:-----------|:----------------|----:|----:|----:|-------:|----------------:|----------------:|-----:|--------------:|--------------:|----:|----:|----:|----:|
+| OppositeStrand | Upstream   | RandomGenes     |  44 |   0 |   2 |     10 |               5 |              15 |   14 |            10 |            19 |  19 |  63 |  15 |   2 |
+| SameStrand     | Upstream   | RandomGenes     |  27 |   0 |   4 |     13 |              11 |              19 |   18 |            11 |            23 |  20 |  71 |  19 |   4 |
+| SameStrand     | Downstream | RandomGenes     |  44 |   0 |   5 |     12 |              10 |              19 |   14 |            11 |            18 |  23 |  35 |  10 |   2 |
+| OppositeStrand | Downstream | RandomGenes     |  27 |   0 |   1 |      7 |               1 |              10 |   14 |             6 |            20 |  26 |  57 |  17 |   3 |
+| SameStrand     | Upstream   | LessRandomGenes |  50 |   0 |   2 |      5 |               3 |              10 |    9 |             5 |            11 |  12 |  46 |   9 |   1 |
+| OppositeStrand | Upstream   | LessRandomGenes |  50 |   0 |   1 |      9 |               4 |              11 |   10 |             7 |            12 |  17 |  29 |   9 |   1 |
+| OppositeStrand | Downstream | LessRandomGenes |  39 |   0 |   2 |      8 |               4 |              10 |   14 |             9 |            20 |  16 |  63 |  18 |   3 |
+| SameStrand     | Downstream | LessRandomGenes |  50 |   0 |   7 |     12 |               9 |              16 |   16 |            13 |            19 |  24 |  55 |  13 |   2 |
+| OppositeStrand | Upstream   | AllGenes        | 236 |   0 |   3 |     10 |               9 |              12 |   13 |            12 |            15 |  19 |  63 |  12 |   1 |
+| SameStrand     | Upstream   | AllGenes        | 215 |   0 |   5 |     11 |              10 |              12 |   14 |            13 |            16 |  20 |  80 |  14 |   1 |
+| OppositeStrand | Downstream | AllGenes        | 248 |   0 |   3 |     10 |               8 |              11 |   15 |            13 |            17 |  20 |  71 |  16 |   1 |
+| SameStrand     | Downstream | AllGenes        | 223 |   0 |   5 |     12 |              10 |              13 |   15 |            13 |            17 |  21 |  80 |  14 |   1 |
+
+Descriptive statistics on intergenic distances
 
 We can perform statistical tests to evaluate if the distances observed
 in a gene set are significantly different from the distances observed in
@@ -275,7 +278,7 @@ MyDistTests <- distTests(Dist2GeneSets,
 Table:
 
 | GeneSet         | Orientation    | Side       | KS.pvalue | Wilcox.pvalue | Indep.pvalue | Median\_resample.pvalue |
-| :-------------- | :------------- | :--------- | --------: | ------------: | -----------: | ----------------------: |
+|:----------------|:---------------|:-----------|----------:|--------------:|-------------:|------------------------:|
 | LessRandomGenes | SameStrand     | Upstream   |   0.00038 |       8.9e-05 |      0.00051 |                    0.00 |
 | LessRandomGenes | OppositeStrand | Upstream   |   0.26000 |       4.8e-02 |      0.03100 |                    0.23 |
 | LessRandomGenes | SameStrand     | Downstream |   0.94000 |       3.2e-01 |      0.43000 |                    0.82 |
@@ -284,6 +287,8 @@ Table:
 | RandomGenes     | OppositeStrand | Upstream   |   0.89000 |       9.9e-01 |      0.63000 |                    0.56 |
 | RandomGenes     | SameStrand     | Downstream |   0.45000 |       5.6e-01 |      0.77000 |                    0.72 |
 | RandomGenes     | OppositeStrand | Downstream |   0.21000 |       2.5e-01 |      0.77000 |                    0.19 |
+
+Test statistics on intergenic distances
 
 Now, we can plot the distribution of intergenic distances for these sets
 of genes:
@@ -308,7 +313,7 @@ their promoter, etc…).
 First we extract the profiles of annotations around (+/-50bp) all our
 “mock” genes.  
 We use 3 bins to summarize the coverage on the gene body so genes of
-size \<3bp are removed.  
+size &lt;3bp are removed.  
 We also use the argument *usePercent=TRUE* so that the profiles only
 indicate the presence/absence (0/1) of an annotation at a position
 rather than the number of genes that cover this position.
@@ -344,7 +349,7 @@ annotated and the *Antisense* strand is the opposite strand.
 Because we used *usePercent=TRUE*, the *Feature\_Sense* profiles will
 only contain 1s, indicating the presence of annotation(s) all along the
 body of each focus gene (i.e. annotation of the focus gene itself). When
-*usePercent=FALSE*, values \>1 can occur in these profile, when the
+*usePercent=FALSE*, values &gt;1 can occur in these profile, when the
 focus gene overlaps with other genes annotated on the same strand.
 
 Then, we assemble these different elements in order to produce a vector
@@ -392,8 +397,7 @@ names(avgProf) <- names(GeneGroups)
 
 Before plotting, we need to assemble these profiles in a single table
 and to provide the x-coordinates for these “metagene” profiles (in the
-interval \[0,5\] with the gene body occupying coordinates
-\]2,3\[).
+interval \[0,5\] with the gene body occupying coordinates \]2,3\[).
 
 ``` r
 #Define the x-coordinates (the 3 sequences correspond to "Upstream", "GeneBody" and "Downstream")
@@ -464,8 +468,7 @@ CP <- getCumulPercentProfiles(extTSScov,
                               genesets = GeneGroups)
 ```
 
-And plot the results
-with:
+And plot the results with:
 
 ``` r
 plotCumulPercentProfile(CP)
