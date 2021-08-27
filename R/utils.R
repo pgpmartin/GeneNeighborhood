@@ -105,6 +105,8 @@ return(prof)
 #' as end(gr) when strand(gr)=="-"
 #' The function considers that strand=="*" is equivalent to strand=="+"
 #'
+#' @seealso \code{\link{getTESregion}}
+#'
 #' @examples
 #' ## Get the TSS of genes in GeneGR:
 #'   GenomicRanges::promoters(Genegr, upstream = 0, downstream = 1)
@@ -188,6 +190,7 @@ return(tes)
 #'         \code{\link[GenomicRanges:intra-range-methods]{flank}} and
 #'         \code{\link[GenomicRanges:intra-range-methods]{trim}}
 #'         in \code{\link[GenomicRanges:intra-range-methods]{intra-range-methods}}
+#'         \code{\link{getTES}}
 #'
 #' @examples
 #' ## Get a 50bp region on each side of the TSS of genes in GeneGR:

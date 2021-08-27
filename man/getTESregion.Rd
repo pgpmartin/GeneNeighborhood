@@ -66,6 +66,7 @@ use \code{upstream=500} and \code{downstream=501}
         \code{\link[GenomicRanges:intra-range-methods]{flank}} and
         \code{\link[GenomicRanges:intra-range-methods]{trim}}
         in \code{\link[GenomicRanges:intra-range-methods]{intra-range-methods}}
+        \code{\link{getTES}}
 }
 \author{
 Pascal GP Martin

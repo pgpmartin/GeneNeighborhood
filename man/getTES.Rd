@@ -31,6 +31,9 @@ mygrglist <- S4Vectors::split(Genegr,
 getTES(mygrglist)
 
 }
+\seealso{
+\code{\link{getTESregion}}
+}
 \author{
 Pascal GP Martin
 }
